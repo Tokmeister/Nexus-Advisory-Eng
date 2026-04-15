@@ -14,6 +14,15 @@ const CookieBanner = lazy(() =>
 
 const STANDALONE_PATHS = [
   '/',
+  '/about',
+  '/features',
+  '/advisory-platform',
+  '/contact',
+  '/security',
+  '/privacy',
+  '/cookies',
+  '/legal',
+  '/developers',
   '/login',
   '/signup',
   '/update-password',
