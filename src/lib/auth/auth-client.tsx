@@ -43,9 +43,28 @@ type SupabaseUserLike = {
   app_metadata?: Record<string, unknown>;
 };
 
+type EdgeSignupResponse = {
+  user?: SupabaseUserLike;
+  session?: {
+    access_token: string;
+    refresh_token: string;
+    user?: SupabaseUserLike;
+  } | null;
+  organisationId?: string;
+};
+
+type EdgeFunctionError = {
+  message?: string;
+  error?: string;
+};
+
 type SupabaseClientLike = {
   auth: {
     getSession: () => Promise<{ data: { session: { user?: SupabaseUserLike } | null }; error: unknown }>;
+    setSession: (args: { access_token: string; refresh_token: string }) => Promise<{
+      data?: { session?: { user?: SupabaseUserLike } | null };
+      error: { message?: string } | null;
+    }>;
     signInWithPassword: (args: { email: string; password: string }) => Promise<{
       data: { user?: SupabaseUserLike; session?: { user?: SupabaseUserLike } | null };
       error: { message?: string } | null;
@@ -159,20 +178,17 @@ function clearOrganisationId() {
 async function lookupOrganisationId(user?: SupabaseUserLike | null): Promise<string> {
   if (!user?.id) return '';
 
-  // 1. Check user metadata first (zero network cost)
   const metaOrg = readMetaOrganisationId(user);
   if (metaOrg) {
     writeOrganisationId(metaOrg);
     return metaOrg;
   }
 
-  // 2. Check localStorage cache (zero network cost)
   const cached =
     clean(localStorage.getItem('activeOrganisationId')) ||
     clean(localStorage.getItem('nexus_selected_organisation_id'));
   if (cached) return cached;
 
-  // 3. Single Supabase query — no retry waterfall
   try {
     const supabase = await getSupabase();
     const { data, error } = await supabase
@@ -189,7 +205,7 @@ async function lookupOrganisationId(user?: SupabaseUserLike | null): Promise<str
       }
     }
   } catch {
-    // Silently fall through — user stays functional without org ID
+    // User can still function without org context until next refresh/sync
   }
 
   return '';
@@ -230,46 +246,6 @@ async function readCurrentSession(): Promise<AuthSession | null> {
     user: normaliseSessionUser(user),
     session,
   };
-}
-
-async function ensureOrganisationAndProfile(user: SupabaseUserLike, payload: SignUpPayload) {
-  const supabase = await getSupabase();
-
-  const organisationName = clean(payload.organisationName);
-  if (!organisationName) {
-    throw new Error('Organisation name is required.');
-  }
-
-  const fullName = clean(payload.name) || clean(payload.email);
-  const email = clean(payload.email).toLowerCase();
-
-  const { data: organisation, error: organisationError } = await supabase
-    .from('organisations')
-    .insert([{ name: organisationName }])
-    .select('id,name')
-    .single();
-
-  if (organisationError) {
-    throw new Error(organisationError.message || 'Organisation insert failed.');
-  }
-
-  const profileRow = {
-    id: user.id,
-    organisation_id: organisation.id,
-    email,
-    full_name: fullName,
-    role: 'client_admin',
-  };
-
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .upsert([profileRow], { onConflict: 'id' });
-
-  if (profileError) {
-    throw new Error(profileError.message || 'Profile upsert failed.');
-  }
-
-  writeOrganisationId(clean(organisation.id));
 }
 
 export const signIn = {
@@ -320,9 +296,9 @@ export const signUp = {
       const supabase = await getSupabase();
       const email = clean(payload.email).toLowerCase();
       const password = payload.password;
-      const name = clean(payload.name);
       const organisationName = clean(payload.organisationName);
       const category = clean(payload.category);
+      const fullName = clean(payload.name);
 
       if (!organisationName) {
         return {
@@ -331,37 +307,74 @@ export const signUp = {
         };
       }
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: name,
-            organisation_name: organisationName,
-            client_category: category,
-          },
-        },
-      });
-
-      if (error) {
-        return { data: null, error: { message: error.message || 'Sign-up failed.' } };
-      }
-
-      const user = data?.user;
-      if (!user?.id) {
+      if (!fullName) {
         return {
           data: null,
-          error: { message: 'Sign-up completed without a valid user record.' },
+          error: { message: 'Full name is required.' },
         };
       }
 
-      await ensureOrganisationAndProfile(user, payload);
+      const parts = fullName.split(/\s+/).filter(Boolean);
+      const firstName = parts[0] || '';
+      const lastName = parts.slice(1).join(' ') || parts[0] || '';
+
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          firstName,
+          lastName,
+          organisationName,
+          category,
+          country: 'South Africa',
+          timezone: 'Africa/Johannesburg',
+        }),
+      });
+
+      const result = (await response.json().catch(() => null)) as EdgeSignupResponse | EdgeFunctionError | null;
+
+      if (!response.ok) {
+        const message =
+          (result as EdgeFunctionError | null)?.message ||
+          (result as EdgeFunctionError | null)?.error ||
+          'Sign-up failed.';
+        return { data: null, error: { message } };
+      }
+
+      const session = (result as EdgeSignupResponse | null)?.session || null;
+      const user = (result as EdgeSignupResponse | null)?.user || session?.user || null;
+      const organisationId = clean((result as EdgeSignupResponse | null)?.organisationId);
+
+      if (session?.access_token && session?.refresh_token) {
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+        });
+
+        if (sessionError) {
+          return {
+            data: null,
+            error: { message: sessionError.message || 'Session setup failed after sign-up.' },
+          };
+        }
+      }
+
+      if (organisationId) {
+        writeOrganisationId(organisationId);
+      }
+
       emitAuthChanged();
 
       return {
         data: {
-          user: normaliseSessionUser(user),
-          session: data?.session || null,
+          user: normaliseSessionUser(user || undefined),
+          session,
         },
         error: null,
       };
@@ -373,7 +386,6 @@ export const signUp = {
     }
   },
 };
-
 
 export async function requestPasswordReset(email: string): Promise<AuthResult<boolean>> {
   try {
