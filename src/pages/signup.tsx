@@ -39,17 +39,6 @@ export default function SignupPage() {
 
   const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
 
-  const splitName = (fullName: string) => {
-    const clean = fullName.trim().replace(/\s+/g, ' ');
-    if (!clean) return { firstName: '', lastName: '' };
-
-    const parts = clean.split(' ');
-    const firstName = parts[0] || '';
-    const lastName = parts.slice(1).join(' ') || firstName;
-
-    return { firstName, lastName };
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage(null);
@@ -64,76 +53,30 @@ export default function SignupPage() {
       return;
     }
 
-    if (!form.fullName.trim()) {
-      setMessage({ text: 'Full name is required.', type: 'warn' });
-      return;
-    }
-
-    if (!form.email.trim()) {
-      setMessage({ text: 'Email address is required.', type: 'warn' });
-      return;
-    }
-
-    if (!form.password) {
-      setMessage({ text: 'Password is required.', type: 'warn' });
-      return;
-    }
-
     if (form.password !== form.confirmPassword) {
       setMessage({ text: 'Passwords do not match.', type: 'warn' });
       return;
     }
 
-    const { firstName, lastName } = splitName(form.fullName);
-
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('signup', {
-        body: {
-          email: form.email.trim(),
-          password: form.password,
-          firstName,
-          lastName,
-          organisationName: form.organisationName.trim(),
-          category: form.category,
-          country: 'South Africa',
-          timezone: 'Africa/Johannesburg',
-        },
+      const result = await signUp.email({
+        email: form.email,
+        password: form.password,
+        name: form.fullName,
+        organisationName: form.organisationName,
+        category: form.category,
       });
 
-      if (error) {
-        throw error;
+      if (result.error) {
+        setMessage({ text: result.error.message || 'Sign-up failed.', type: 'error' });
+      } else {
+        setMessage({ text: 'Account created! Redirecting to login…', type: 'success' });
+        setTimeout(() => navigate('/login'), 1200);
       }
-
-      if (!data) {
-        throw new Error('No response returned from signup function.');
-      }
-
-      if (data.session?.access_token && data.session?.refresh_token) {
-        const { error: sessionError } = await supabase.auth.setSession({
-          access_token: data.session.access_token,
-          refresh_token: data.session.refresh_token,
-        });
-
-        if (sessionError) {
-          throw sessionError;
-        }
-      }
-
-      if (data.organisationId) {
-        localStorage.setItem('activeOrganisationId', data.organisationId);
-        localStorage.setItem('organisation_id', data.organisationId);
-      }
-
-      setMessage({ text: 'Account created! Redirecting to login…', type: 'success' });
-      setTimeout(() => navigate('/login'), 1200);
-    } catch (err: any) {
-      const errorMessage =
-        err?.message ||
-        err?.context?.message ||
-        'Something went wrong. Please try again.';
-      setMessage({ text: errorMessage, type: 'error' });
+    } catch {
+      setMessage({ text: 'Something went wrong. Please try again.', type: 'error' });
     } finally {
       setLoading(false);
     }
