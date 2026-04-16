@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase/client';
+import { signUp } from '@/lib/auth/auth-client';
 import { HeaderAuthActions, PublicFooter, PublicHeader, SHELL_BG } from '@/components/PublicMarketingChrome';
 
 const CATEGORIES = [
