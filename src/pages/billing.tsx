@@ -31,6 +31,7 @@ export default function BillingPage() {
   const [selectedPlan, setSelectedPlan] = useState<PlanCode>('startup');
   const [statusMessage, setStatusMessage] = useState<{ text: string; tone: 'error' | 'success' | 'info' } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const [renderingPayPal, setRenderingPayPal] = useState(false);
   const paypalContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -44,6 +45,7 @@ export default function BillingPage() {
         const billing = await getBillingState();
         if (!mounted) return;
         if (billing.status === 'active') {
+          setHasActiveSubscription(true);
           navigate('/welcome', { replace: true });
           return;
         }
@@ -135,7 +137,7 @@ export default function BillingPage() {
       }
     };
 
-    if (!loading) {
+    if (!loading && !hasActiveSubscription) {
       void renderButtons();
     }
 
@@ -143,7 +145,7 @@ export default function BillingPage() {
       mounted = false;
       if (paypalContainerRef.current) paypalContainerRef.current.innerHTML = '';
     };
-  }, [cycle, selectedPlan, loading, activePlanId, navigate]);
+  }, [cycle, selectedPlan, loading, hasActiveSubscription, activePlanId, navigate]);
 
   const msgStyles: Record<'error' | 'success' | 'info', React.CSSProperties> = {
     error: { background: '#fff1f1', border: '1px solid #f2b6b6', color: '#b42318' },
@@ -287,3 +289,4 @@ export default function BillingPage() {
     </div>
   );
 }
+
