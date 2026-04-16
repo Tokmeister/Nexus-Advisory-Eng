@@ -219,6 +219,21 @@ export async function savePendingSelection(args: { planCode: PlanCode; billingCy
   const supabase = await getSupabase();
   const now = new Date().toISOString();
 
+  const existing = await supabase
+    .from('organisation_subscriptions')
+    .select('status,plan_code,billing_cycle,paypal_subscription_id,renews_at')
+    .eq('organisation_id', organisationId)
+    .maybeSingle();
+
+  if (existing.error) {
+    throw new Error(existing.error.message || 'Could not read current subscription state.');
+  }
+
+  const existingStatus = clean(existing.data?.status);
+  if (existingStatus === 'active') {
+    return;
+  }
+
   const { error } = await supabase.from('organisation_subscriptions').upsert(
     [
       {
@@ -332,3 +347,4 @@ export function SubscribedRoute({ children }: { children: ReactNode }) {
 
   return <>{children}</>;
 }
+
