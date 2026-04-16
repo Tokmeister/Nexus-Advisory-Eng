@@ -43,28 +43,9 @@ type SupabaseUserLike = {
   app_metadata?: Record<string, unknown>;
 };
 
-type EdgeSignupResponse = {
-  user?: SupabaseUserLike;
-  session?: {
-    access_token: string;
-    refresh_token: string;
-    user?: SupabaseUserLike;
-  } | null;
-  organisationId?: string;
-};
-
-type EdgeFunctionError = {
-  message?: string;
-  error?: string;
-};
-
 type SupabaseClientLike = {
   auth: {
     getSession: () => Promise<{ data: { session: { user?: SupabaseUserLike } | null }; error: unknown }>;
-    setSession: (args: { access_token: string; refresh_token: string }) => Promise<{
-      data?: { session?: { user?: SupabaseUserLike } | null };
-      error: { message?: string } | null;
-    }>;
     signInWithPassword: (args: { email: string; password: string }) => Promise<{
       data: { user?: SupabaseUserLike; session?: { user?: SupabaseUserLike } | null };
       error: { message?: string } | null;
@@ -99,6 +80,9 @@ type SupabaseClientLike = {
       rows: Record<string, unknown>[],
       options?: { onConflict?: string }
     ) => Promise<{ data: unknown; error: { message?: string } | null }>;
+  };
+  functions: {
+    invoke: (functionName: string, options?: { body?: Record<string, unknown> }) => Promise<{ data: unknown; error: { message?: string } | null }>;
   };
 };
 
@@ -178,17 +162,20 @@ function clearOrganisationId() {
 async function lookupOrganisationId(user?: SupabaseUserLike | null): Promise<string> {
   if (!user?.id) return '';
 
+  // 1. Check user metadata first (zero network cost)
   const metaOrg = readMetaOrganisationId(user);
   if (metaOrg) {
     writeOrganisationId(metaOrg);
     return metaOrg;
   }
 
+  // 2. Check localStorage cache (zero network cost)
   const cached =
     clean(localStorage.getItem('activeOrganisationId')) ||
     clean(localStorage.getItem('nexus_selected_organisation_id'));
   if (cached) return cached;
 
+  // 3. Single Supabase query — no retry waterfall
   try {
     const supabase = await getSupabase();
     const { data, error } = await supabase
@@ -205,7 +192,7 @@ async function lookupOrganisationId(user?: SupabaseUserLike | null): Promise<str
       }
     }
   } catch {
-    // User can still function without org context until next refresh/sync
+    // Silently fall through — user stays functional without org ID
   }
 
   return '';
@@ -296,9 +283,9 @@ export const signUp = {
       const supabase = await getSupabase();
       const email = clean(payload.email).toLowerCase();
       const password = payload.password;
+      const name = clean(payload.name);
       const organisationName = clean(payload.organisationName);
       const category = clean(payload.category);
-      const fullName = clean(payload.name);
 
       if (!organisationName) {
         return {
@@ -307,64 +294,50 @@ export const signUp = {
         };
       }
 
-      if (!fullName) {
+      // FIX: Call the Edge Function instead of direct client-side inserts
+      // The Edge Function atomically creates:
+      // 1. Auth user
+      // 2. Organisation
+      // 3. Profile
+      // All in one transaction, or all roll back on error
+      const { data: edgeFunctionResult, error: edgeFunctionError } = await supabase.functions.invoke(
+        'signup',
+        {
+          body: {
+            email,
+            password,
+            full_name: name,
+            organisation_name: organisationName,
+            client_category: category,
+          },
+        }
+      );
+
+      if (edgeFunctionError) {
         return {
           data: null,
-          error: { message: 'Full name is required.' },
+          error: { message: edgeFunctionError.message || 'Sign-up failed.' },
         };
       }
 
-      const parts = fullName.split(/\s+/).filter(Boolean);
-      const firstName = parts[0] || '';
-      const lastName = parts.slice(1).join(' ') || parts[0] || '';
-
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          firstName,
-          lastName,
-          organisationName,
-          category,
-          country: 'South Africa',
-          timezone: 'Africa/Johannesburg',
-        }),
-      });
-
-      const result = (await response.json().catch(() => null)) as EdgeSignupResponse | EdgeFunctionError | null;
-
-      if (!response.ok) {
-        const message =
-          (result as EdgeFunctionError | null)?.message ||
-          (result as EdgeFunctionError | null)?.error ||
-          'Sign-up failed.';
-        return { data: null, error: { message } };
+      if (!edgeFunctionResult) {
+        return {
+          data: null,
+          error: { message: 'Sign-up completed but received no response.' },
+        };
       }
 
-      const session = (result as EdgeSignupResponse | null)?.session || null;
-      const user = (result as EdgeSignupResponse | null)?.user || session?.user || null;
-      const organisationId = clean((result as EdgeSignupResponse | null)?.organisationId);
-
-      if (session?.access_token && session?.refresh_token) {
-        const { error: sessionError } = await supabase.auth.setSession({
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-        });
-
-        if (sessionError) {
-          return {
-            data: null,
-            error: { message: sessionError.message || 'Session setup failed after sign-up.' },
-          };
-        }
+      // The Edge Function returns the new user, organisation, and profile
+      const user = (edgeFunctionResult as any)?.user;
+      if (!user?.id) {
+        return {
+          data: null,
+          error: { message: 'Sign-up completed without a valid user record.' },
+        };
       }
 
+      // Write org ID to local storage for context
+      const organisationId = (edgeFunctionResult as any)?.organisation_id;
       if (organisationId) {
         writeOrganisationId(organisationId);
       }
@@ -373,8 +346,8 @@ export const signUp = {
 
       return {
         data: {
-          user: normaliseSessionUser(user || undefined),
-          session,
+          user: normaliseSessionUser(user),
+          session: null,
         },
         error: null,
       };
@@ -386,6 +359,7 @@ export const signUp = {
     }
   },
 };
+
 
 export async function requestPasswordReset(email: string): Promise<AuthResult<boolean>> {
   try {
@@ -579,3 +553,4 @@ export function LogoutButton({
     </button>
   );
 }
+
