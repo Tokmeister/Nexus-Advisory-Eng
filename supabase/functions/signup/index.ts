@@ -1,4 +1,4 @@
-// functions/signup.ts
+// functions/signup.ts (FIXED VERSION)
 // Supabase Edge Function for atomic signup
 // This runs on the server in a trusted context, can bypass RLS for setup
 
@@ -84,7 +84,6 @@ export default async (req: Request): Promise<Response> => {
     }
 
     // Initialize Supabase Admin client
-    // NOTE: In production, get these from environment variables
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 
@@ -126,6 +125,7 @@ export default async (req: Request): Promise<Response> => {
     }
 
     // Step 2: Create Organisation
+    // FIXED: Removed 'category' field and added 'industry' instead (matches your schema)
     const organisationId = generateOrgId();
     const { data: orgData, error: orgError } = await supabaseAdmin
       .from('organisations')
@@ -133,7 +133,7 @@ export default async (req: Request): Promise<Response> => {
         {
           id: organisationId,
           name: organisationName,
-          category: category,
+          industry: category,  // ← CHANGED: Use 'industry' instead of 'category'
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
@@ -202,4 +202,3 @@ export default async (req: Request): Promise<Response> => {
     );
   }
 };
-
