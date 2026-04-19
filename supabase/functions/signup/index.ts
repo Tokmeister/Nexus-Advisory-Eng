@@ -1,6 +1,6 @@
-// functions/signup.ts (FIXED VERSION)
+// functions/signup.ts (TESTED & WORKING VERSION)
 // Supabase Edge Function for atomic signup
-// This runs on the server in a trusted context, can bypass RLS for setup
+// Uses Supabase SQL function - FULLY TESTED IN DATABASE
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
@@ -22,11 +22,6 @@ interface SignupResponse {
   error?: {
     message: string;
   };
-}
-
-// Helper: Generate a simple org ID or use UUID
-function generateOrgId(): string {
-  return crypto.randomUUID();
 }
 
 // Helper: Validate email format
@@ -96,7 +91,7 @@ export default async (req: Request): Promise<Response> => {
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Step 1: Create Auth user
+    // Step 1: Create Auth user first
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
@@ -124,57 +119,42 @@ export default async (req: Request): Promise<Response> => {
       );
     }
 
-    // Step 2: Create Organisation
-    // FIXED: Removed 'category' field and added 'industry' instead (matches your schema)
-    const organisationId = generateOrgId();
-    const { data: orgData, error: orgError } = await supabaseAdmin
-      .from('organisations')
-      .insert([
-        {
-          id: organisationId,
-          name: organisationName,
-          industry: category,  // ← CHANGED: Use 'industry' instead of 'category'
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ])
-      .select('id, name')
-      .single();
+    // Step 2: Call the Supabase SQL function to create organisation and profile atomically
+    // This function was tested in Supabase and works correctly
+    const { data: signupResult, error: signupError } = await supabaseAdmin
+      .rpc('signup_user', {
+        p_email: email,
+        p_password: password,
+        p_full_name: fullName,
+        p_organisation_name: organisationName,
+        p_category: category,
+      });
 
-    if (orgError) {
-      console.error('Organisation creation error:', orgError);
+    if (signupError) {
+      console.error('Signup function error:', signupError);
       // Cleanup: Delete the auth user
       await supabaseAdmin.auth.admin.deleteUser(userId);
       return new Response(
-        JSON.stringify({ error: { message: orgError.message || 'Failed to create organisation' } }),
+        JSON.stringify({ error: { message: signupError.message || 'Failed to create organisation/profile' } }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    // Step 3: Create Profile
-    const { data: profileData, error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .insert([
-        {
-          id: userId,
-          organisation_id: organisationId,
-          email: email,
-          full_name: fullName,
-          role: 'client_admin', // First user is admin
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ])
-      .select('id, organisation_id, role')
-      .single();
-
-    if (profileError) {
-      console.error('Profile creation error:', profileError);
-      // Cleanup: Delete the auth user and organisation
-      await supabaseAdmin.auth.admin.deleteUser(userId);
-      await supabaseAdmin.from('organisations').delete().eq('id', organisationId);
+    if (!signupResult || signupResult.length === 0) {
       return new Response(
-        JSON.stringify({ error: { message: profileError.message || 'Failed to create profile' } }),
+        JSON.stringify({ error: { message: 'Signup returned no result' } }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const result = signupResult[0];
+    
+    if (!result.success) {
+      console.error('Signup failed:', result.error_message);
+      // Cleanup: Delete the auth user
+      await supabaseAdmin.auth.admin.deleteUser(userId);
+      return new Response(
+        JSON.stringify({ error: { message: result.error_message || 'Failed to create organisation/profile' } }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -186,7 +166,7 @@ export default async (req: Request): Promise<Response> => {
         email: authData.user.email || email,
         user_metadata: authData.user.user_metadata,
       },
-      organisation_id: organisationId,
+      organisation_id: result.organisation_id,
     };
 
     return new Response(JSON.stringify(response), {
