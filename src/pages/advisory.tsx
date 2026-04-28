@@ -1,3 +1,12 @@
+Replace the **entire** file:
+
+```text
+src/pages/advisory.tsx
+```
+
+with this complete code:
+
+```tsx
 import { useEffect, useMemo, useState } from 'react';
 import NexusShell from '@/components/NexusShell';
 import {
@@ -13,7 +22,6 @@ import {
 import {
   buildAdvisoryOutput,
   clearCurrentOutput,
-  loadCurrentOutput,
   openPrintView,
   saveCurrentOutput,
   type AdvisoryInput,
@@ -21,44 +29,7 @@ import {
 } from '@/lib/advisoryLogic';
 import { fetchRecentHistoryOutputs } from '@/lib/nexus-data';
 
-type SupabaseUserLike = {
-  id?: string;
-  email?: string;
-  user_metadata?: Record<string, unknown>;
-  app_metadata?: Record<string, unknown>;
-};
-
-type SupabaseClientLike = {
-  auth: {
-    getSession: () => Promise<{
-      data: { session: { user?: SupabaseUserLike } | null };
-      error: { message?: string } | null;
-    }>;
-  };
-  from: (table: string) => {
-    select: (columns?: string) => {
-      eq: (column: string, value: string) => {
-        maybeSingle: () => Promise<{ data: Record<string, unknown> | null; error: { message?: string } | null }>;
-        order?: unknown;
-      };
-      order?: (column: string, opts?: { ascending?: boolean }) => {
-        limit: (count: number) => {
-          maybeSingle: () => Promise<{ data: Record<string, unknown> | null; error: { message?: string } | null }>;
-        };
-      };
-    };
-    insert: (rows: Record<string, unknown>[]) => {
-      select: (columns?: string) => {
-        single: () => Promise<{ data: Record<string, unknown>; error: { message?: string } | null }>;
-        then?: unknown;
-      };
-    };
-    update: (rows: Record<string, unknown>) => {
-      eq: (column: string, value: string) => Promise<{ data: unknown; error: { message?: string } | null }>;
-    };
-  };
-};
-
+type SupabaseClientLike = any;
 
 const industryOptions = [
   'Construction',
@@ -75,27 +46,34 @@ const inputFields = [
     id: 'challenge',
     label: 'Primary Business Challenge',
     placeholder: 'Describe the core challenge or problem statement…',
-    type: 'textarea',
     rows: 3,
   },
   {
     id: 'goal',
     label: 'Strategic Goal',
     placeholder: 'What outcome is the client trying to achieve?',
-    type: 'textarea',
     rows: 2,
   },
   {
     id: 'constraints',
     label: 'Known Constraints',
     placeholder: 'Budget, timeline, regulatory, or operational constraints…',
-    type: 'textarea',
     rows: 2,
   },
 ];
 
 const urgencyOptions = ['Low', 'Medium', 'High', 'Critical'];
-const valueTypeOptions = ['Revenue Growth', 'Cost Saving', 'Margin Improvement', 'Cash Flow Improvement', 'Loss Prevention', 'Efficiency Gain', 'Other'];
+
+const valueTypeOptions = [
+  'Revenue Growth',
+  'Cost Saving',
+  'Margin Improvement',
+  'Cash Flow Improvement',
+  'Loss Prevention',
+  'Efficiency Gain',
+  'Other',
+];
+
 const urgencyColors: Record<string, string> = {
   Low: '#22c55e',
   Medium: '#f59e0b',
@@ -140,24 +118,29 @@ async function getSupabase(): Promise<SupabaseClientLike> {
 }
 
 function slugify(value: string) {
-  return clean(value)
-    .toUpperCase()
-    .replace(/[^A-Z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || 'CLIENT';
+  return (
+    clean(value)
+      .toUpperCase()
+      .replace(/[^A-Z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'CLIENT'
+  );
 }
 
 function buildReportId(clientName: string) {
   const now = new Date();
+
   const datePart = [
     now.getFullYear(),
     String(now.getMonth() + 1).padStart(2, '0'),
     String(now.getDate()).padStart(2, '0'),
   ].join('');
+
   const timePart = [
     String(now.getHours()).padStart(2, '0'),
     String(now.getMinutes()).padStart(2, '0'),
     String(now.getSeconds()).padStart(2, '0'),
   ].join('');
+
   const milliPart = String(now.getMilliseconds()).padStart(3, '0');
 
   return `NEXUS-${slugify(clientName)}-${datePart}-${timePart}-${milliPart}`;
@@ -215,7 +198,12 @@ async function getCurrentProfile() {
   return profileLookup.data;
 }
 
-async function insertAdvisoryInputRow(organisationId: string, formData: Record<string, string>, industry: string, urgency: string) {
+async function insertAdvisoryInputRow(
+  organisationId: string,
+  formData: Record<string, string>,
+  industry: string,
+  urgency: string
+) {
   const supabase = await getSupabase();
 
   const payload = {
@@ -286,14 +274,22 @@ async function createReportRow(
   return data;
 }
 
-async function ensureProjectRow(organisationId: string, reportRowId: string, advisoryInputId: string, advisoryRow: Record<string, unknown>, reportTitle: string) {
+async function ensureProjectRow(
+  organisationId: string,
+  reportRowId: string,
+  advisoryInputId: string,
+  advisoryRow: Record<string, unknown>,
+  reportTitle: string
+) {
   const supabase = await getSupabase();
 
   const clientName = clean(advisoryRow.client_name || 'Client');
   const industry = clean(advisoryRow.industry || '');
-  const projectName = clean(reportTitle) || (industry ? `${clientName} - ${industry} Execution Project` : `${clientName} Execution Project`);
+  const projectName =
+    clean(reportTitle) || (industry ? `${clientName} - ${industry} Execution Project` : `${clientName} Execution Project`);
 
   const challenge = clean(advisoryRow.primary_business_challenge || '');
+
   const insertPayload = {
     organisation_id: organisationId,
     report_id: reportRowId,
@@ -322,26 +318,28 @@ async function ensureProjectRow(organisationId: string, reportRowId: string, adv
   return data;
 }
 
-async function seedProjectActions(projectId: string, organisationId: string, output: AdvisoryRecord & Record<string, unknown>) {
+async function seedProjectActions(
+  projectId: string,
+  organisationId: string,
+  output: AdvisoryRecord & Record<string, unknown>
+) {
   const supabase = await getSupabase();
 
-  const sourceActions = Array.isArray(output.actions) && output.actions.length
-    ? output.actions
-    : Array.isArray(output.recommendations) && output.recommendations.length
-      ? output.recommendations
-      : [
-          ...(output.roadmap?.day30 || []),
-          ...(output.roadmap?.day60 || []),
-        ].slice(0, 5);
+  const sourceActions =
+    Array.isArray(output.actions) && output.actions.length
+      ? output.actions
+      : Array.isArray(output.recommendations) && output.recommendations.length
+        ? output.recommendations
+        : [...(output.roadmap?.day30 || []), ...(output.roadmap?.day60 || [])].slice(0, 5);
 
   const actionLines = sourceActions
-    .map(item => clean(item))
+    .map((item: unknown) => clean(item))
     .filter(Boolean)
     .slice(0, 6);
 
   if (!actionLines.length) return [];
 
-  const rows = actionLines.map((actionItem, index) => ({
+  const rows = actionLines.map((actionItem: string, index: number) => ({
     project_id: projectId,
     organisation_id: organisationId,
     action_item: actionItem,
@@ -364,6 +362,95 @@ async function seedProjectActions(projectId: string, organisationId: string, out
   return data || [];
 }
 
+function buildInputQuality(formData: Record<string, string>, industry: string, urgency: string) {
+  const checks = [
+    {
+      label: 'Client name captured',
+      gap: 'Add the client name.',
+      points: 10,
+      passed: Boolean(clean(formData.client)),
+    },
+    {
+      label: 'Industry selected',
+      gap: 'Select the client industry.',
+      points: 10,
+      passed: Boolean(clean(industry)),
+    },
+    {
+      label: 'Primary business challenge is clear',
+      gap: 'Describe the primary business challenge in more detail.',
+      points: 20,
+      passed: clean(formData.challenge).length >= 40,
+    },
+    {
+      label: 'Strategic goal is defined',
+      gap: 'Add a clearer strategic goal or target outcome.',
+      points: 15,
+      passed: clean(formData.goal).length >= 25,
+    },
+    {
+      label: 'Known constraints captured',
+      gap: 'Add known constraints such as budget, timing, capacity, skills, or regulation.',
+      points: 10,
+      passed: Boolean(clean(formData.constraints)),
+    },
+    {
+      label: 'Urgency level selected',
+      gap: 'Confirm the urgency level.',
+      points: 5,
+      passed: Boolean(clean(urgency)),
+    },
+    {
+      label: 'Value type selected',
+      gap: 'Select the value type, such as revenue growth, cost saving, or efficiency gain.',
+      points: 10,
+      passed: Boolean(clean(formData.valueType)),
+    },
+    {
+      label: 'Estimated value included',
+      gap: 'Add an estimated value in ZAR.',
+      points: 10,
+      passed: Number(clean(formData.estimatedValue).replace(/[^0-9.-]+/g, '')) > 0,
+    },
+    {
+      label: 'Business function affected captured',
+      gap: 'Add the business function affected, such as sales, operations, finance, compliance, or production.',
+      points: 10,
+      passed: Boolean(clean(formData.businessFunction)),
+    },
+  ];
+
+  const score = checks.reduce((total, item) => total + (item.passed ? item.points : 0), 0);
+  const strong = checks.filter((item) => item.passed).map((item) => item.label);
+  const gaps = checks.filter((item) => !item.passed).map((item) => item.gap);
+
+  const label =
+    score >= 85
+      ? 'Executive-ready input'
+      : score >= 70
+        ? 'Strong input'
+        : score >= 40
+          ? 'Usable input'
+          : 'Weak input';
+
+  const recommendation =
+    score >= 85
+      ? 'This input is strong enough for a high-quality advisory output.'
+      : score >= 70
+        ? 'This input is strong enough for a first-pass advisory report, but a few extra details will improve precision.'
+        : score >= 40
+          ? 'This input can generate an advisory, but the output may be generic unless the missing fields are improved.'
+          : 'This input needs more context before Nexus can generate a credible executive advisory output.';
+
+  return {
+    score,
+    label,
+    recommendation,
+    strong,
+    gaps,
+  };
+}
+
 export default function AdvisoryPage() {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [formData, setFormData] = useState<Record<string, string>>({});
@@ -379,26 +466,7 @@ export default function AdvisoryPage() {
   useEffect(() => {
     let active = true;
 
-    const savedOutput = loadCurrentOutput();
-    if (savedOutput) {
-      setCurrentOutput(savedOutput);
-      setGenerated(true);
-      setFormData({
-        client: savedOutput.client,
-        challenge: savedOutput.challenge,
-        goal: savedOutput.goal,
-        constraints: '',
-        impactAreas: savedOutput.focusTags.join(', '),
-        financialExposure: '',
-        valueType: '',
-        estimatedValue: '',
-        businessFunction: '',
-        triggerSource: '',
-        notes: '',
-      });
-      setIndustry(savedOutput.industry);
-      setUrgency(savedOutput.urgency);
-    }
+    clearCurrentOutput();
 
     getCurrentProfile()
       .then((profile) => {
@@ -421,6 +489,13 @@ export default function AdvisoryPage() {
     };
   }, []);
 
+  const inputQuality = useMemo(
+    () => buildInputQuality(formData, industry, urgency),
+    [formData, industry, urgency]
+  );
+
+  const preview = useMemo(() => currentOutput, [currentOutput]);
+
   const handleGenerate = async () => {
     if (generating) return;
 
@@ -439,13 +514,16 @@ export default function AdvisoryPage() {
       if (!clean(formData.challenge)) throw new Error('Primary Business Challenge is required.');
       if (!clean(formData.goal)) throw new Error('Strategic Goal is required.');
       if (!clean(formData.valueType)) throw new Error('Value Type is required.');
+
       const estimatedValueNumber = Number(clean(formData.estimatedValue).replace(/[^0-9.-]+/g, ''));
       if (!Number.isFinite(estimatedValueNumber) || estimatedValueNumber <= 0) {
         throw new Error('Estimated Value (ZAR) must be greater than 0.');
       }
+
       if (!clean(formData.businessFunction)) throw new Error('Business Function is required.');
 
       const advisoryRow = await insertAdvisoryInputRow(organisationId, formData, industry, urgency);
+
       const cachedOrganisationId = clean(activeOrganisationId) || organisationId;
       if (!activeOrganisationId && cachedOrganisationId) {
         setActiveOrganisationId(cachedOrganisationId);
@@ -490,6 +568,7 @@ export default function AdvisoryPage() {
       };
 
       const report = await createReportRow(organisationId, clean(advisoryRow.id), advisoryRow, output);
+
       const project = await ensureProjectRow(
         organisationId,
         clean(report.id),
@@ -513,6 +592,7 @@ export default function AdvisoryPage() {
       saveCurrentOutput(output);
       setCurrentOutput(output);
       setGenerated(true);
+
       setStatusMessage(
         `Advisory generated and saved to system for ${advisoryInput.client}. advisory_inputs, reports, projects, and project_actions were written.`
       );
@@ -543,7 +623,8 @@ export default function AdvisoryPage() {
 
   const handleSaveReport = () => {
     if (!currentOutput) return;
-    setStatusMessage('Report already lives in Supabase. Reports, Projects, and Local History are now reading from the live system.');
+    saveCurrentOutput(currentOutput);
+    setStatusMessage('Report remains saved in Supabase. Local preview cache was refreshed for the current session.');
   };
 
   const cardStyle = (id: string): React.CSSProperties => ({
@@ -565,20 +646,15 @@ export default function AdvisoryPage() {
     padding: '1.75rem',
   };
 
-  const kicker = (t: string) => (
-    <div
-      style={{
-        fontSize: '0.6rem',
-        letterSpacing: '0.2em',
-        color: '#3b82f6',
-        textTransform: 'uppercase' as const,
-        fontWeight: '600',
-        marginBottom: '0.2rem',
-      }}
-    >
-      {t}
-    </div>
-  );
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '0.7rem',
+    color: '#60a5fa',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: '0.08em',
+    marginBottom: '0.35rem',
+  };
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
@@ -590,11 +666,24 @@ export default function AdvisoryPage() {
     fontSize: '0.82rem',
     outline: 'none',
     boxSizing: 'border-box',
-    resize: 'vertical' as const,
+    resize: 'vertical',
     fontFamily: 'inherit',
   };
 
-  const preview = useMemo(() => currentOutput, [currentOutput]);
+  const kicker = (text: string) => (
+    <div
+      style={{
+        fontSize: '0.6rem',
+        letterSpacing: '0.2em',
+        color: '#3b82f6',
+        textTransform: 'uppercase',
+        fontWeight: '600',
+        marginBottom: '0.2rem',
+      }}
+    >
+      {text}
+    </div>
+  );
 
   return (
     <NexusShell>
@@ -626,11 +715,13 @@ export default function AdvisoryPage() {
             >
               Intelligence Generation Layer
             </div>
+
             <h1 style={{ margin: '0 0 0.5rem', fontSize: '1.5rem', fontWeight: '800', color: '#e2e8f0' }}>
               NEXUS Advisory Engine
             </h1>
-            <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem', lineHeight: '1.6', maxWidth: '680px' }}>
-              Generate structured executive advisory outputs from client inputs. Each output includes strategic recommendations, risk flags, confidence scoring, and now full Supabase persistence.
+
+            <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem', lineHeight: '1.6', maxWidth: '760px' }}>
+              Generate structured executive advisory outputs from client inputs. Nexus now scores the quality of the input before generation, helping users strengthen context before producing an advisory report.
             </p>
           </div>
         </div>
@@ -647,6 +738,100 @@ export default function AdvisoryPage() {
             }}
           >
             {statusMessage}
+          </div>
+        </div>
+
+        <div style={{ marginBottom: '1rem' }}>
+          <div
+            style={{
+              background: '#0d1526',
+              border: '1px solid #1e3a5f',
+              borderLeft: '3px solid #2563eb',
+              borderRadius: '12px',
+              padding: '1rem 1.25rem',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'flex-start', marginBottom: '0.85rem' }}>
+              <div>
+                <div
+                  style={{
+                    fontSize: '0.6rem',
+                    letterSpacing: '0.18em',
+                    color: '#3b82f6',
+                    textTransform: 'uppercase',
+                    fontWeight: '700',
+                    marginBottom: '0.25rem',
+                  }}
+                >
+                  Advisory Input Quality
+                </div>
+
+                <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#e2e8f0' }}>
+                  {inputQuality.label}
+                </div>
+
+                <p style={{ margin: '0.45rem 0 0', color: '#94a3b8', fontSize: '0.78rem', lineHeight: '1.55' }}>
+                  {inputQuality.recommendation}
+                </p>
+              </div>
+
+              <div style={{ minWidth: '110px', textAlign: 'right' }}>
+                <div style={{ fontSize: '1.9rem', fontWeight: '900', color: '#60a5fa', lineHeight: 1 }}>
+                  {inputQuality.score}%
+                </div>
+                <div style={{ fontSize: '0.62rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: '0.25rem' }}>
+                  Quality Score
+                </div>
+              </div>
+            </div>
+
+            <div style={{ height: '8px', background: '#0a0f1e', border: '1px solid #1e3a5f', borderRadius: '999px', overflow: 'hidden', marginBottom: '1rem' }}>
+              <div
+                style={{
+                  height: '100%',
+                  width: `${inputQuality.score}%`,
+                  background:
+                    inputQuality.score >= 85
+                      ? '#22c55e'
+                      : inputQuality.score >= 70
+                        ? '#60a5fa'
+                        : inputQuality.score >= 40
+                          ? '#f59e0b'
+                          : '#ef4444',
+                  transition: 'width 0.2s ease',
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div>
+                <div style={{ fontSize: '0.65rem', color: '#60a5fa', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.45rem' }}>
+                  Strong
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  {(inputQuality.strong.length ? inputQuality.strong : ['No strong input fields yet.']).slice(0, 5).map((item) => (
+                    <div key={item} style={{ color: '#cbd5e1', fontSize: '0.74rem', lineHeight: '1.4' }}>
+                      ✓ {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '0.65rem', color: '#f59e0b', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.45rem' }}>
+                  Needs Improvement
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  {(inputQuality.gaps.length ? inputQuality.gaps : ['No major input gaps detected.']).slice(0, 5).map((item) => (
+                    <div key={item} style={{ color: '#94a3b8', fontSize: '0.74rem', lineHeight: '1.4' }}>
+                      • {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -667,46 +852,20 @@ export default function AdvisoryPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
               <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: '0.7rem',
-                    color: '#60a5fa',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    marginBottom: '0.35rem',
-                  }}
-                >
-                  Client Name
-                </label>
+                <label style={labelStyle}>Client Name</label>
                 <input
                   placeholder="e.g. Acme Corp"
                   value={formData.client || ''}
-                  onChange={e => setFormData(p => ({ ...p, client: e.target.value }))}
+                  onChange={(e) => setFormData((p) => ({ ...p, client: e.target.value }))}
                   style={inputStyle}
-                  onFocus={e => (e.target.style.borderColor = '#2563eb')}
-                  onBlur={e => (e.target.style.borderColor = '#1e3a5f')}
                 />
               </div>
 
               <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: '0.7rem',
-                    color: '#60a5fa',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    marginBottom: '0.35rem',
-                  }}
-                >
-                  Industry
-                </label>
+                <label style={labelStyle}>Industry</label>
                 <select
                   value={industry}
-                  onChange={e => setIndustry(e.target.value)}
+                  onChange={(e) => setIndustry(e.target.value)}
                   style={{
                     ...inputStyle,
                     appearance: 'none',
@@ -714,11 +873,9 @@ export default function AdvisoryPage() {
                     cursor: 'pointer',
                     color: industry ? '#e2e8f0' : '#475569',
                   }}
-                  onFocus={e => (e.currentTarget.style.borderColor = '#2563eb')}
-                  onBlur={e => (e.currentTarget.style.borderColor = '#1e3a5f')}
                 >
                   <option value="">Select industry</option>
-                  {industryOptions.map(option => (
+                  {industryOptions.map((option) => (
                     <option key={option} value={option}>
                       {option}
                     </option>
@@ -726,50 +883,25 @@ export default function AdvisoryPage() {
                 </select>
               </div>
 
-              {inputFields.map(field => (
+              {inputFields.map((field) => (
                 <div key={field.id}>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '0.7rem',
-                      color: '#60a5fa',
-                      fontWeight: '600',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.08em',
-                      marginBottom: '0.35rem',
-                    }}
-                  >
-                    {field.label}
-                  </label>
+                  <label style={labelStyle}>{field.label}</label>
                   <textarea
                     rows={field.rows}
                     placeholder={field.placeholder}
                     value={formData[field.id] || ''}
-                    onChange={e => setFormData(p => ({ ...p, [field.id]: e.target.value }))}
+                    onChange={(e) => setFormData((p) => ({ ...p, [field.id]: e.target.value }))}
                     style={inputStyle}
-                    onFocus={e => (e.target.style.borderColor = '#2563eb')}
-                    onBlur={e => (e.target.style.borderColor = '#1e3a5f')}
                   />
                 </div>
               ))}
 
               <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: '0.7rem',
-                    color: '#60a5fa',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    marginBottom: '0.35rem',
-                  }}
-                >
-                  Urgency
-                </label>
+                <label style={labelStyle}>Urgency</label>
                 <div style={{ display: 'flex', gap: '0.55rem', flexWrap: 'wrap' }}>
-                  {urgencyOptions.map(option => {
+                  {urgencyOptions.map((option) => {
                     const active = urgency === option;
+
                     return (
                       <button
                         key={option}
@@ -793,27 +925,16 @@ export default function AdvisoryPage() {
               </div>
 
               <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: '0.7rem',
-                    color: '#60a5fa',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    marginBottom: '0.35rem',
-                  }}
-                >
-                  Value Type
-                </label>
+                <label style={labelStyle}>Value Type</label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
-                  {valueTypeOptions.map(option => {
+                  {valueTypeOptions.map((option) => {
                     const active = formData.valueType === option;
+
                     return (
                       <button
                         key={option}
                         type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, valueType: option }))}
+                        onClick={() => setFormData((prev) => ({ ...prev, valueType: option }))}
                         style={{
                           border: `1px solid ${active ? '#2563eb' : '#334155'}`,
                           background: active ? 'rgba(37,99,235,0.18)' : 'rgba(15,23,42,0.65)',
@@ -832,120 +953,107 @@ export default function AdvisoryPage() {
               </div>
 
               <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: '0.7rem',
-                    color: '#60a5fa',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    marginBottom: '0.35rem',
-                  }}
-                >
-                  Estimated Value (ZAR)
-                </label>
+                <label style={labelStyle}>Estimated Value (ZAR)</label>
                 <input
                   type="number"
                   min="0.01"
                   step="0.01"
                   placeholder="Provide your best estimate of the financial upside, saving, or exposure"
                   value={formData.estimatedValue || ''}
-                  onChange={e => setFormData(p => ({ ...p, estimatedValue: e.target.value }))}
+                  onChange={(e) => setFormData((p) => ({ ...p, estimatedValue: e.target.value }))}
                   style={inputStyle}
-                  onFocus={e => (e.target.style.borderColor = '#2563eb')}
-                  onBlur={e => (e.target.style.borderColor = '#1e3a5f')}
                 />
-                <div style={{ marginTop: '0.35rem', color: '#94a3b8', fontSize: '0.72rem', lineHeight: '1.5' }}>
-                  A directional estimate is acceptable. This supports business-case prioritisation and executive analytics.
-                </div>
               </div>
 
-              {[
-                { id: 'impactAreas', label: 'Impact Areas', placeholder: 'Operations, Margin, Customer Service…' },
-                { id: 'financialExposure', label: 'Estimated Financial Exposure', placeholder: 'e.g. R2m to R5m annually' },
-                { id: 'businessFunction', label: 'Business Function Affected', placeholder: 'e.g. Operations' },
-                { id: 'triggerSource', label: 'Trigger Source', placeholder: 'What triggered this advisory?' },
-                { id: 'notes', label: 'Additional Notes', placeholder: 'Anything else useful for the engine?' },
-              ].map(field => (
-                <div key={field.id}>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '0.7rem',
-                      color: '#60a5fa',
-                      fontWeight: '600',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.08em',
-                      marginBottom: '0.35rem',
-                    }}
-                  >
-                    {field.label}
-                  </label>
-                  <input
-                    placeholder={field.placeholder}
-                    value={formData[field.id] || ''}
-                    onChange={e => setFormData(p => ({ ...p, [field.id]: e.target.value }))}
-                    style={inputStyle}
-                    onFocus={e => (e.target.style.borderColor = '#2563eb')}
-                    onBlur={e => (e.target.style.borderColor = '#1e3a5f')}
-                  />
-                </div>
-              ))}
+              <div>
+                <label style={labelStyle}>Business Function Affected</label>
+                <input
+                  placeholder="e.g. Sales, Operations, Finance, Compliance, Production"
+                  value={formData.businessFunction || ''}
+                  onChange={(e) => setFormData((p) => ({ ...p, businessFunction: e.target.value }))}
+                  style={inputStyle}
+                />
+              </div>
 
-              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+              <div>
+                <label style={labelStyle}>Impact Areas</label>
+                <input
+                  placeholder="e.g. Revenue, turnaround time, capacity, reporting, cash flow"
+                  value={formData.impactAreas || ''}
+                  onChange={(e) => setFormData((p) => ({ ...p, impactAreas: e.target.value }))}
+                  style={inputStyle}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>Estimated Financial Exposure</label>
+                <input
+                  placeholder="e.g. R500k revenue opportunity, R100k monthly leakage"
+                  value={formData.financialExposure || ''}
+                  onChange={(e) => setFormData((p) => ({ ...p, financialExposure: e.target.value }))}
+                  style={inputStyle}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>Trigger Source</label>
+                <input
+                  placeholder="e.g. Client concern, leadership review, operational issue, growth opportunity"
+                  value={formData.triggerSource || ''}
+                  onChange={(e) => setFormData((p) => ({ ...p, triggerSource: e.target.value }))}
+                  style={inputStyle}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>Additional Notes</label>
+                <textarea
+                  rows={2}
+                  placeholder="Any additional strategic or operational context…"
+                  value={formData.notes || ''}
+                  onChange={(e) => setFormData((p) => ({ ...p, notes: e.target.value }))}
+                  style={inputStyle}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap', marginTop: '0.35rem' }}>
                 <button
+                  type="button"
                   onClick={handleGenerate}
                   disabled={generating}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '0.45rem',
-                    background: generating ? '#334155' : '#2563eb',
+                    background: generating ? '#1e3a5f' : '#2563eb',
+                    border: '1px solid #2563eb',
                     color: '#fff',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '0.7rem 1rem',
+                    borderRadius: '9px',
+                    padding: '0.65rem 1rem',
+                    fontSize: '0.78rem',
                     fontWeight: '700',
                     cursor: generating ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  <Send size={14} />
+                  {generating ? <RefreshCw size={14} /> : <Send size={14} />}
                   {generating ? 'Generating…' : 'Generate Advisory'}
                 </button>
 
                 <button
-                  onClick={handleSaveReport}
-                  disabled={!currentOutput}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.45rem',
-                    background: 'transparent',
-                    color: currentOutput ? '#60a5fa' : '#64748b',
-                    border: `1px solid ${currentOutput ? '#2563eb' : '#334155'}`,
-                    borderRadius: '8px',
-                    padding: '0.7rem 1rem',
-                    fontWeight: '700',
-                    cursor: currentOutput ? 'pointer' : 'not-allowed',
-                  }}
-                >
-                  <Save size={14} />
-                  Save Report
-                </button>
-
-                <button
+                  type="button"
                   onClick={handleClear}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.45rem',
                     background: 'transparent',
+                    border: '1px solid #1e3a5f',
                     color: '#94a3b8',
-                    border: '1px solid #334155',
-                    borderRadius: '8px',
-                    padding: '0.7rem 1rem',
-                    fontWeight: '700',
+                    borderRadius: '9px',
+                    padding: '0.65rem 1rem',
+                    fontSize: '0.78rem',
+                    fontWeight: '600',
                     cursor: 'pointer',
                   }}
                 >
@@ -962,127 +1070,137 @@ export default function AdvisoryPage() {
               Executive Preview
             </h3>
 
-            {!preview ? (
-              <div
-                style={{
-                  display: 'grid',
-                  placeItems: 'center',
-                  minHeight: '420px',
-                  border: '1px dashed #1e3a5f',
-                  borderRadius: '12px',
-                  background: 'rgba(255,255,255,0.02)',
-                }}
-              >
-                <div style={{ textAlign: 'center' }}>
-                  <Cpu size={22} color="#3b82f6" style={{ marginBottom: '0.75rem' }} />
-                  <div style={{ color: '#e2e8f0', fontWeight: '700', marginBottom: '0.35rem' }}>
-                    No advisory generated yet
-                  </div>
-                  <div style={{ color: '#94a3b8', fontSize: '0.82rem' }}>
-                    Complete the form and generate the advisory to preview the structured output.
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={cardStyle('preview-head')}>
-                  <div style={{ fontSize: '0.68rem', color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.35rem' }}>
+            {preview ? (
+              <div>
+                <div
+                  style={{
+                    background: '#0a0f1e',
+                    border: '1px solid #1e3a5f',
+                    borderLeft: '3px solid #2563eb',
+                    borderRadius: '10px',
+                    padding: '1.25rem',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  <div style={{ color: '#60a5fa', fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.45rem' }}>
                     {preview.industry}
                   </div>
-                  <div style={{ fontSize: '1.05rem', fontWeight: '800', color: '#e2e8f0', marginBottom: '0.35rem' }}>
-                    {preview.executiveTitle || `${preview.client} Advisory Review`}
-                  </div>
-                  <div style={{ color: '#94a3b8', fontSize: '0.82rem', lineHeight: '1.65' }}>
+
+                  <h2 style={{ margin: '0 0 0.75rem', color: '#e2e8f0', fontSize: '1.05rem' }}>
+                    {preview.executiveTitle || `${preview.client} Strategic Review`}
+                  </h2>
+
+                  <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.82rem', lineHeight: '1.7' }}>
                     {preview.executiveText || preview.summary}
-                  </div>
+                  </p>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1rem' }}>
                   {[
                     { label: 'Priority', value: preview.priority, icon: AlertTriangle },
                     { label: 'Confidence', value: preview.confidence, icon: TrendingUp },
-                    { label: 'Urgency', value: preview.urgency, icon: AlertTriangle },
-                    { label: 'Category', value: preview.category, icon: CheckCircle },
-                  ].map(({ label, value, icon: Icon }, i) => (
-                    <div key={i} style={cardStyle(`metric-${i}`)}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                        <div style={{ fontSize: '0.62rem', color: '#94a3b8', textTransform: 'uppercase' }}>{label}</div>
-                        <Icon size={13} color="#2563eb" />
+                    { label: 'Urgency', value: preview.urgency, icon: CheckCircle },
+                  ].map(({ label, value, icon: Icon }) => (
+                    <div key={label} style={{ background: '#0a0f1e', border: '1px solid #1e3a5f', borderRadius: '9px', padding: '0.85rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                        <span style={{ color: '#60a5fa', fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
+                        <Icon size={13} color="#60a5fa" />
                       </div>
-                      <div style={{ color: '#e2e8f0', fontSize: '0.9rem', fontWeight: '700' }}>{value}</div>
+                      <div style={{ color: '#e2e8f0', fontWeight: '800', fontSize: '0.9rem' }}>{value || '--'}</div>
                     </div>
                   ))}
                 </div>
 
-                <div style={cardStyle('issue')}>
-                  <div style={{ fontSize: '0.68rem', color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.35rem' }}>
-                    Issue Statement
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
+                  <div style={{ background: '#0a0f1e', border: '1px solid #1e3a5f', borderRadius: '9px', padding: '1rem' }}>
+                    <div style={{ color: '#60a5fa', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.55rem' }}>
+                      Recommendations
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: '1rem', color: '#94a3b8', fontSize: '0.76rem', lineHeight: '1.6' }}>
+                      {(preview.recommendations || []).slice(0, 4).map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
                   </div>
-                  <div style={{ color: '#cbd5e1', fontSize: '0.82rem', lineHeight: '1.65' }}>
-                    {preview.issueStatement || preview.challenge}
+
+                  <div style={{ background: '#0a0f1e', border: '1px solid #1e3a5f', borderRadius: '9px', padding: '1rem' }}>
+                    <div style={{ color: '#60a5fa', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.55rem' }}>
+                      Execution Priorities
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: '1rem', color: '#94a3b8', fontSize: '0.76rem', lineHeight: '1.6' }}>
+                      {(preview.priorities || []).slice(0, 4).map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
 
-                <div style={cardStyle('recommendations')}>
-                  <div style={{ fontSize: '0.68rem', color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.5rem' }}>
-                    Recommendations
-                  </div>
-                  <ul style={{ margin: 0, paddingLeft: '1rem', color: '#cbd5e1', fontSize: '0.82rem', lineHeight: '1.7' }}>
-                    {(preview.recommendations || []).map((item, idx) => (
-                      <li key={idx}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div style={cardStyle('roadmap')}>
-                  <div style={{ fontSize: '0.68rem', color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem' }}>
-                    30 / 60 / 90 Day Roadmap
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
-                    {[
-                      { title: preview.roadmap?.day30Title, items: preview.roadmap?.day30 || [] },
-                      { title: preview.roadmap?.day60Title, items: preview.roadmap?.day60 || [] },
-                      { title: preview.roadmap?.day90Title, items: preview.roadmap?.day90 || [] },
-                    ].map((block, idx) => (
-                      <div key={idx} style={{ background: '#0a0f1e', border: '1px solid #1e3a5f', borderRadius: '10px', padding: '0.85rem' }}>
-                        <div style={{ color: '#e2e8f0', fontSize: '0.8rem', fontWeight: '700', marginBottom: '0.5rem' }}>
-                          {block.title}
-                        </div>
-                        <ul style={{ margin: 0, paddingLeft: '1rem', color: '#94a3b8', fontSize: '0.75rem', lineHeight: '1.6' }}>
-                          {block.items.map((item, itemIdx) => (
-                            <li key={itemIdx}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
                   <button
-  onClick={() => {
-    if (preview) openPrintView(preview);
-  }}
-  disabled={!preview}
-  style={{
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.45rem',
-    background: 'transparent',
-    color: preview ? '#60a5fa' : '#64748b',
-    border: `1px solid ${preview ? '#2563eb' : '#334155'}`,
-    borderRadius: '8px',
-    padding: '0.7rem 1rem',
-    fontWeight: '700',
-    cursor: preview ? 'pointer' : 'not-allowed',
-  }}
->
-  <ChevronRight size={14} />
-  Open Print View
-</button>
+                    type="button"
+                    onClick={() => openPrintView(preview)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.45rem',
+                      background: '#2563eb',
+                      border: '1px solid #2563eb',
+                      color: '#fff',
+                      borderRadius: '9px',
+                      padding: '0.65rem 1rem',
+                      fontSize: '0.78rem',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Cpu size={14} />
+                    Open Print View
+                  </button>
 
-                  <div style={{ color: '#94a3b8', fontSize: '0.74rem' }}>
-                    Report ID: {preview.reportId || 'Pending'}
+                  <button
+                    type="button"
+                    onClick={handleSaveReport}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.45rem',
+                      background: 'transparent',
+                      border: '1px solid #1e3a5f',
+                      color: '#94a3b8',
+                      borderRadius: '9px',
+                      padding: '0.65rem 1rem',
+                      fontSize: '0.78rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Save size={14} />
+                    Save Preview
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div
+                style={{
+                  minHeight: '360px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: '#0a0f1e',
+                  border: '1px dashed #1e3a5f',
+                  borderRadius: '10px',
+                  color: '#94a3b8',
+                  textAlign: 'center',
+                  padding: '2rem',
+                }}
+              >
+                <div>
+                  <Cpu size={34} color="#2563eb" style={{ marginBottom: '0.75rem' }} />
+                  <div style={{ color: '#e2e8f0', fontWeight: '800', marginBottom: '0.35rem' }}>
+                    Clean advisory workspace
+                  </div>
+                  <div style={{ fontSize: '0.8rem', lineHeight: '1.6', maxWidth: '420px' }}>
+                    Complete the client context form and use the quality score to strengthen the input before generating an executive advisory output.
                   </div>
                 </div>
               </div>
@@ -1092,25 +1210,49 @@ export default function AdvisoryPage() {
 
         <div style={panel}>
           {kicker('Local History')}
-          <h3 style={{ margin: '0 0 1rem', fontSize: '0.95rem', fontWeight: '700', color: '#e2e8f0' }}>
-            Saved Advisory Outputs
+          <h3 style={{ margin: '0 0 1.25rem', fontSize: '0.95rem', fontWeight: '700', color: '#e2e8f0' }}>
+            Recent Organisation Reports
           </h3>
 
-          {!historyOutputs.length ? (
-            <div style={{ color: '#94a3b8', fontSize: '0.82rem' }}>
-              No saved advisory outputs found in Supabase yet.
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.85rem' }}>
-              {historyOutputs.slice(0, 6).map((item, idx) => (
-                <div key={idx} style={cardStyle(`history-${idx}`)}>
-                  <div style={{ fontSize: '0.65rem', color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.25rem' }}>
-                    {item.industry}
+          {historyOutputs.length ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+              {historyOutputs.map((item, index) => (
+                <div
+                  key={`${item.reportId}-${index}`}
+                  onClick={() => {
+                    setCurrentOutput(item);
+                    setGenerated(true);
+                    setStatusMessage(`Loaded recent report preview for ${item.client}.`);
+                  }}
+                  style={{
+                    background: '#0a0f1e',
+                    border: '1px solid #1e3a5f',
+                    borderRadius: '10px',
+                    padding: '1rem',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div style={{ color: '#60a5fa', fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                    {item.industry || 'Advisory'}
                   </div>
-                  <div style={{ color: '#e2e8f0', fontWeight: '700', marginBottom: '0.25rem' }}>{item.client}</div>
-                  <div style={{ color: '#94a3b8', fontSize: '0.76rem', lineHeight: '1.55' }}>{item.summary}</div>
+
+                  <div style={{ color: '#e2e8f0', fontWeight: '800', fontSize: '0.85rem', marginBottom: '0.45rem' }}>
+                    {item.client}
+                  </div>
+
+                  <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.74rem', lineHeight: '1.55' }}>
+                    {(item.challenge || item.summary || '').slice(0, 120)}…
+                  </p>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#60a5fa', fontSize: '0.68rem', marginTop: '0.75rem' }}>
+                    Open preview <ChevronRight size={12} />
+                  </div>
                 </div>
               ))}
+            </div>
+          ) : (
+            <div style={{ color: '#94a3b8', fontSize: '0.8rem' }}>
+              No recent organisation reports found yet.
             </div>
           )}
         </div>
@@ -1118,3 +1260,10 @@ export default function AdvisoryPage() {
     </NexusShell>
   );
 }
+```
+
+Commit message:
+
+```text
+Add advisory input quality score
+```
