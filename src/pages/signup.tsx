@@ -61,8 +61,6 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      // This now calls the Supabase Edge Function (signup)
-      // which atomically creates Auth user, Organisation, and Profile
       const result = await signUp.email({
         email: form.email,
         password: form.password,
@@ -211,4 +209,3 @@ export default function SignupPage() {
     </div>
   );
 }
-

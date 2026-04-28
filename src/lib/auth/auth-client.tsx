@@ -81,9 +81,6 @@ type SupabaseClientLike = {
       options?: { onConflict?: string }
     ) => Promise<{ data: unknown; error: { message?: string } | null }>;
   };
-  functions: {
-    invoke: (functionName: string, options?: { body?: Record<string, unknown> }) => Promise<{ data: unknown; error: { message?: string } | null }>;
-  };
 };
 
 const AUTH_EVENT = 'nexus-auth-changed';
@@ -235,6 +232,46 @@ async function readCurrentSession(): Promise<AuthSession | null> {
   };
 }
 
+async function ensureOrganisationAndProfile(user: SupabaseUserLike, payload: SignUpPayload) {
+  const supabase = await getSupabase();
+
+  const organisationName = clean(payload.organisationName);
+  if (!organisationName) {
+    throw new Error('Organisation name is required.');
+  }
+
+  const fullName = clean(payload.name) || clean(payload.email);
+  const email = clean(payload.email).toLowerCase();
+
+  const { data: organisation, error: organisationError } = await supabase
+    .from('organisations')
+    .insert([{ name: organisationName }])
+    .select('id,name')
+    .single();
+
+  if (organisationError) {
+    throw new Error(organisationError.message || 'Organisation insert failed.');
+  }
+
+  const profileRow = {
+    id: user.id,
+    organisation_id: organisation.id,
+    email,
+    full_name: fullName,
+    role: 'client_admin',
+  };
+
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .upsert([profileRow], { onConflict: 'id' });
+
+  if (profileError) {
+    throw new Error(profileError.message || 'Profile upsert failed.');
+  }
+
+  writeOrganisationId(clean(organisation.id));
+}
+
 export const signIn = {
   email: async ({ email, password }: SignInPayload): Promise<AuthResult<AuthSession>> => {
     try {
@@ -294,41 +331,23 @@ export const signUp = {
         };
       }
 
-      // FIX: Call the Edge Function instead of direct client-side inserts
-      // The Edge Function atomically creates:
-      // 1. Auth user
-      // 2. Organisation
-      // 3. Profile
-      // All in one transaction, or all roll back on error
-      const { data: edgeFunctionResult, error: edgeFunctionError } = await supabase.functions.invoke(
-        'signup',
-        {
-          body: {
-            email,
-            password,
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
             full_name: name,
             organisation_name: organisationName,
             client_category: category,
           },
-        }
-      );
+        },
+      });
 
-      if (edgeFunctionError) {
-        return {
-          data: null,
-          error: { message: edgeFunctionError.message || 'Sign-up failed.' },
-        };
+      if (error) {
+        return { data: null, error: { message: error.message || 'Sign-up failed.' } };
       }
 
-      if (!edgeFunctionResult) {
-        return {
-          data: null,
-          error: { message: 'Sign-up completed but received no response.' },
-        };
-      }
-
-      // The Edge Function returns the new user, organisation, and profile
-      const user = (edgeFunctionResult as any)?.user;
+      const user = data?.user;
       if (!user?.id) {
         return {
           data: null,
@@ -336,18 +355,13 @@ export const signUp = {
         };
       }
 
-      // Write org ID to local storage for context
-      const organisationId = (edgeFunctionResult as any)?.organisation_id;
-      if (organisationId) {
-        writeOrganisationId(organisationId);
-      }
-
+      await ensureOrganisationAndProfile(user, payload);
       emitAuthChanged();
 
       return {
         data: {
           user: normaliseSessionUser(user),
-          session: null,
+          session: data?.session || null,
         },
         error: null,
       };
@@ -553,4 +567,3 @@ export function LogoutButton({
     </button>
   );
 }
-
