@@ -1,12 +1,3 @@
-Replace the **entire** file:
-
-```text
-src/pages/advisory.tsx
-```
-
-with this complete code:
-
-```tsx
 import { useEffect, useMemo, useState } from 'react';
 import NexusShell from '@/components/NexusShell';
 import {
@@ -1260,10 +1251,3 @@ export default function AdvisoryPage() {
     </NexusShell>
   );
 }
-```
-
-Commit message:
-
-```text
-Add advisory input quality score
-```
