@@ -12,6 +12,18 @@ const CookieBanner = lazy(() =>
   })
 );
 
+const ADVISORY_OUTPUT_STORAGE_KEY = 'nexus_advisory_output_v6';
+
+function clearStaleAdvisoryOutput() {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.localStorage.removeItem(ADVISORY_OUTPUT_STORAGE_KEY);
+  } catch {
+    // Ignore storage access failures. The Advisory page should still render normally.
+  }
+}
+
 const STANDALONE_PATHS = [
   '/',
   '/about',
@@ -44,6 +56,11 @@ const SpinnerFallback = () => (
 
 function LayoutRouter() {
   const location = useLocation();
+
+  if (location.pathname === '/advisory') {
+    clearStaleAdvisoryOutput();
+  }
+
   const isStandalone = STANDALONE_PATHS.includes(location.pathname);
 
   if (isStandalone) {
