@@ -1,17 +1,44 @@
 import type { OverlayConfig } from './types';
 import { clean } from './helpers';
 
-const makeRoadmap = (day30Title: string, day60Title: string, day90Title: string, day30: string[], day60: string[], day90: string[]) => ({
-  day30Title, day60Title, day90Title, day30, day60, day90,
+const makeRoadmap = (
+  day30Title: string,
+  day60Title: string,
+  day90Title: string,
+  day30: string[],
+  day60: string[],
+  day90: string[]
+) => ({
+  day30Title,
+  day60Title,
+  day90Title,
+  day30,
+  day60,
+  day90,
 });
 
 export const PROFESSIONAL_SERVICES_OVERLAY: OverlayConfig = {
   key: 'professional_services',
   label: 'Professional Services',
   keywords: [
-    'consulting', 'consultant', 'professional services', 'advisory', 'proposal', 'proposals',
-    'billable', 'billable hours', 'utilisation', 'utilization', 'retainer', 'client delivery',
-    'engagement', 'fee leakage', 'turnaround time', 'service consistency', 'capacity planning', 'client economics',
+    'consulting',
+    'consultant',
+    'professional services',
+    'advisory',
+    'proposal',
+    'proposals',
+    'billable',
+    'billable hours',
+    'utilisation',
+    'utilization',
+    'retainer',
+    'client delivery',
+    'engagement',
+    'fee leakage',
+    'turnaround time',
+    'service consistency',
+    'capacity planning',
+    'client economics',
   ],
   narrative:
     'Professional services create enduring competitive advantage through disciplined commercial positioning, high-conversion proposal execution, rigorous utilisation governance, and uncompromising focus on client economics and delivery excellence.',
@@ -57,7 +84,21 @@ export const INDUSTRY_OVERLAYS: Record<string, OverlayConfig> = {
   manufacturing: {
     key: 'manufacturing',
     label: 'Manufacturing',
-    keywords: ['manufacturing', 'factory', 'production', 'oee', 'throughput', 'scrap', 'quality', 'line speed', 'downtime', 'inventory', 'bom', 'routing', 'changeover'],
+    keywords: [
+      'manufacturing',
+      'factory',
+      'production',
+      'oee',
+      'throughput',
+      'scrap',
+      'quality',
+      'line speed',
+      'downtime',
+      'inventory',
+      'bom',
+      'routing',
+      'changeover',
+    ],
     narrative:
       'Manufacturing advantage is created when leadership can separate portfolio-level product margin erosion from commercial leakage, schedule instability, quality-control failure, and asset-productivity loss across the full operating system.',
     recommendationBias: [
@@ -97,10 +138,27 @@ export const INDUSTRY_OVERLAYS: Record<string, OverlayConfig> = {
       ]
     ),
   },
+
   printing_packaging: {
     key: 'printing_packaging',
     label: 'Printing & Packaging',
-    keywords: ['printing', 'packaging', 'press', 'prepress', 'finishing', 'specification', 'rerun', 'setup time', 'changeover', 'waste', 'artwork', 'proof', 'job ticket', 'queue', 'dispatch'],
+    keywords: [
+      'printing',
+      'packaging',
+      'press',
+      'prepress',
+      'finishing',
+      'specification',
+      'rerun',
+      'setup time',
+      'changeover',
+      'waste',
+      'artwork',
+      'proof',
+      'job ticket',
+      'queue',
+      'dispatch',
+    ],
     narrative:
       'In printing and packaging, sustainable advantage is created when leadership can separate executive margin leakage from shop-floor waste, control planning and scheduling loss, harden specification integrity, and balance capacity across presses, finishing lines, and sites.',
     recommendationBias: [
@@ -140,10 +198,24 @@ export const INDUSTRY_OVERLAYS: Record<string, OverlayConfig> = {
       ]
     ),
   },
+
   construction: {
     key: 'construction',
     label: 'Construction',
-    keywords: ['construction', 'project', 'variation', 'claim', 'site', 'programme', 'schedule', 'cash flow', 'boq', 'certification', 'retention', 'subcontractor'],
+    keywords: [
+      'construction',
+      'project',
+      'variation',
+      'claim',
+      'site',
+      'programme',
+      'schedule',
+      'cash flow',
+      'boq',
+      'certification',
+      'retention',
+      'subcontractor',
+    ],
     narrative:
       'Construction value is protected when leadership can distinguish portfolio-level margin erosion from project-commercial leakage, site execution risk, programme slippage, and cash exposure across the full contract lifecycle.',
     recommendationBias: [
@@ -183,10 +255,22 @@ export const INDUSTRY_OVERLAYS: Record<string, OverlayConfig> = {
       ]
     ),
   },
+
   agriculture: {
     key: 'agriculture',
     label: 'Agriculture',
-    keywords: ['agriculture', 'yield', 'hectare', 'crop', 'weather', 'farm', 'input cost', 'harvest', 'irrigation', 'livestock'],
+    keywords: [
+      'agriculture',
+      'yield',
+      'hectare',
+      'crop',
+      'weather',
+      'farm',
+      'input cost',
+      'harvest',
+      'irrigation',
+      'livestock',
+    ],
     narrative:
       'Agricultural performance improves when leadership separates portfolio-level enterprise mix and margin choices from farm-level yield execution, layered biological and market risk, and seasonal cash-cycle exposure across the full production and realisation cycle.',
     recommendationBias: [
@@ -226,53 +310,91 @@ export const INDUSTRY_OVERLAYS: Record<string, OverlayConfig> = {
       ]
     ),
   },
+
   healthcare: {
     key: 'healthcare',
-    label: 'Medical / Health Care',
-    keywords: ['medical', 'health', 'healthcare', 'patient', 'clinical', 'case', 'compliance', 'hospital', 'clinic', 'theatre', 'bed occupancy'],
+    label: 'Medical/Health Care',
+    keywords: [
+      'medical',
+      'health',
+      'healthcare',
+      'patient',
+      'clinical',
+      'practice',
+      'clinic',
+      'hospital',
+      'doctor',
+      'nurse',
+      'specialist',
+      'pharmacy',
+      'claims',
+      'billing',
+      'medical aid',
+      'compliance',
+      'patient administration',
+      'appointment',
+    ],
     narrative:
-      'Healthcare performance strengthens when leadership balances clinical quality and patient safety with contribution margin, patient-flow discipline, and revenue-cycle control across hospitals, clinics, and mixed care networks.',
+      'Healthcare performance strengthens when leadership balances patient care quality, clinical governance, operational flow, revenue-cycle discipline, and practical management visibility across the specific care setting being served.',
     recommendationBias: [
-      'Separate clinical quality and safety risk from funding leakage, patient-flow bottlenecks, and capacity under-utilisation so the right control system is improved first.',
-      'Treat contribution per case, admission, consultation, or patient panel as the financial expression of better quality, better flow, and better revenue-cycle discipline.',
-      'Use case mix, payer mix, clinician variability, and capacity utilisation as linked executive control levers across facilities and practices.',
+      'Separate patient-care quality, administrative workflow, revenue-cycle leakage, compliance exposure, and capacity utilisation so the right control system is improved first.',
+      'Treat patient experience, documentation quality, appointment utilisation, claims discipline, and cash conversion as linked healthcare operating levers.',
+      'Adapt the advisory response to the care setting, distinguishing private practices, clinics, hospitals, pharmacies, suppliers, and healthcare administration environments.',
     ],
     actionTemplates: [
-      'Build one executive view of clinical quality, contribution margin, patient flow, and revenue-cycle performance by facility, specialty, or practice.',
-      'Map theatre, bed, diagnostic, clinic-room, and patient-journey bottlenecks alongside denial, billing, and authorisation leakage.',
-      'Stress-test clinical governance, coding accuracy, tariff discipline, and specialist or practitioner variability on the highest-risk services.',
+      'Build one leadership view of patient flow, service quality, revenue-cycle performance, documentation completeness, and operating constraints.',
+      'Map the end-to-end patient, claim, stock, or service workflow to identify where administrative friction, clinical handoff failure, or cash leakage is occurring.',
+      'Strengthen role accountability across clinical staff, front-office administration, finance, stock control, compliance, and management reporting.',
     ],
     riskHints: [
-      'Clinical variation, safety failure, and weak governance can destroy both patient trust and economic value simultaneously.',
-      'Theatre under-utilisation, delayed discharge, and poor scheduling turn capacity into hidden margin leakage.',
-      'Weak authorisation, coding, and billing discipline can erase contribution even when clinical volumes look healthy.',
+      'Weak administrative workflow can pull clinical professionals into avoidable friction and reduce care capacity.',
+      'Delayed claims, incomplete documentation, and poor billing follow-up can damage cash flow even when patient demand is healthy.',
+      'Healthcare operating failure can erode patient trust, staff morale, compliance control, and economic performance at the same time.',
     ],
-    focusTags: ['Clinical Quality & Safety', 'Contribution per Case / Patient', 'Capacity & Patient Flow', 'Revenue Cycle Control'],
+    focusTags: [
+      'Patient Administration',
+      'Clinical Governance',
+      'Revenue Cycle Control',
+      'Practice / Facility Operations',
+      'Compliance Visibility',
+    ],
     roadmapBias: makeRoadmap(
-      'Quality, Margin & Flow Diagnostic',
-      'Control Recovery',
-      'Disciplined Care Delivery Model',
+      'Healthcare Operating Diagnostic',
+      'Workflow & Control Recovery',
+      'Disciplined Care Operating Model',
       [
-        'Separate clinical quality risk, financial leakage, patient-flow bottlenecks, and revenue-cycle pressure across facilities or practices.',
-        'Create one leadership view of case mix, payer mix, capacity utilisation, denial rate, and outcome variance.',
-        'Quantify the highest-value leakage pools across length-of-stay, cancellations, coding, rejected claims, and patient-flow delays.',
+        'Separate patient-care quality, administrative workflow, revenue-cycle leakage, compliance exposure, and management visibility across the specific healthcare setting.',
+        'Create one leadership view of patient flow, appointment utilisation, claims status, billing follow-up, documentation completeness, and operating risk.',
+        'Quantify the highest-value leakage points across patient administration, claims, stock, staff workload, compliance, and cash conversion.',
       ],
       [
-        'Intervene on the departments, specialties, or practices carrying the greatest quality, contribution, and cash-flow risk.',
-        'Tighten governance over clinical variation, scheduling, discharge flow, coding, and billing with explicit owner accountability.',
-        'Link frontline operating recovery directly to margin, cash, and patient-outcome measures.',
+        'Tighten scheduling, documentation, billing, claims follow-up, stock control, and role accountability where operating friction is highest.',
+        'Intervene on the workflows creating the greatest risk to patient experience, cash conversion, staff workload, or compliance control.',
+        'Introduce weekly operating reviews that connect care quality, workflow discipline, revenue-cycle control, and management action.',
       ],
       [
-        'Embed a healthcare operating model that links quality, patient flow, contribution margin, and revenue-cycle control.',
-        'Standardise review rhythms across hospitals, clinics, and specialties where the network model requires it.',
-        'Position better care and better economics as mutually reinforcing leadership outcomes.',
+        'Embed a healthcare operating model that links patient experience, workflow reliability, revenue-cycle discipline, compliance, and management reporting.',
+        'Standardise review rhythms across practices, clinics, departments, sites, or service lines according to the client’s operating model.',
+        'Position disciplined healthcare operations as the basis for better care, stronger trust, better cash flow, and sustainable capacity.',
       ]
     ),
   },
+
   energy: {
     key: 'energy',
     label: 'Energy',
-    keywords: ['energy', 'solar', 'wind', 'renewable', 'ppa', 'grid', 'turbine', 'module', 'battery', 'commissioning'],
+    keywords: [
+      'energy',
+      'solar',
+      'wind',
+      'renewable',
+      'ppa',
+      'grid',
+      'turbine',
+      'module',
+      'battery',
+      'commissioning',
+    ],
     narrative:
       'Energy value is protected when leadership can separate portfolio-level project economics from schedule and commissioning risk, contractual leakage, and funding exposure across the development, construction, and operations lifecycle of renewable assets.',
     recommendationBias: [
@@ -312,6 +434,7 @@ export const INDUSTRY_OVERLAYS: Record<string, OverlayConfig> = {
       ]
     ),
   },
+
   general: {
     key: 'general',
     label: 'General Business',
@@ -328,18 +451,26 @@ export const INDUSTRY_OVERLAYS: Record<string, OverlayConfig> = {
 
 export function resolveOverlayKey(industry: string): string {
   const industryClean = clean(industry).toLowerCase();
+
   const industryKeyMap: Record<string, string> = {
     'professional services': 'professional_services',
-    'manufacturing': 'manufacturing',
+    manufacturing: 'manufacturing',
     'printing/packaging': 'printing_packaging',
-    'construction': 'construction',
-    'agriculture': 'agriculture',
+    'printing & packaging': 'printing_packaging',
+    construction: 'construction',
+    agriculture: 'agriculture',
     'medical/health care': 'healthcare',
-    'energy': 'energy',
+    'medical / health care': 'healthcare',
+    healthcare: 'healthcare',
+    health: 'healthcare',
+    medical: 'healthcare',
+    energy: 'energy',
   };
+
   for (const [pattern, key] of Object.entries(industryKeyMap)) {
     if (industryClean.includes(pattern)) return key;
   }
+
   return 'general';
 }
 
