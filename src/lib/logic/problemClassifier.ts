@@ -1,4 +1,3 @@
-Gts
 import { clean, keywordScoreByField, normaliseUrgency } from './helpers';
 import { resolveOverlayKey } from './industryOverlays';
 import type { AdvisoryInput, ClassificationResult } from './types';
