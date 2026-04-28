@@ -13,6 +13,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Institute weekly performance tracking of conversion rates, utilisation, delivery quality, and margins by account.',
     ],
   },
+
   ps_utilisation_economics: {
     quickWins: [
       'Create account-level visibility on billable recovery, utilisation mix, and realised contribution by service line.',
@@ -25,6 +26,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Institutionalise weekly review of utilisation quality and margin realisation by account.',
     ],
   },
+
   ps_operating_model: {
     quickWins: [
       'Clarify role interfaces across sales, solutioning, delivery, and account leadership.',
@@ -37,7 +39,21 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Use role clarity and decision cadence as the foundation for scalable service delivery.',
     ],
   },
-  pp_waste_rework: {
+
+  pp_executive_margin_leakage: {
+    quickWins: [
+      'Build a portfolio margin view by customer, product family, site, job type, and quoting discipline.',
+      'Identify unprofitable work, absorbed customer changes, under-pricing, and filler work consuming capacity without adequate return.',
+      'Create executive visibility on where commercial decisions are creating production pressure and margin erosion.',
+    ],
+    priorities: [
+      'Treat portfolio mix and quoting discipline as executive margin-control levers.',
+      'Reposition the business around profitable work, priority sectors, and disciplined customer segmentation.',
+      'Embed margin-quality review before capacity is committed to low-return work.',
+    ],
+  },
+
+  pp_operational_waste_rework: {
     quickWins: [
       'Quantify waste, reruns, and spoilage at job, press, and finishing level.',
       'Identify the three largest avoidable margin leaks caused by waste or rework.',
@@ -49,11 +65,12 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Institutionalise right-first-time discipline across the end-to-end print flow.',
     ],
   },
-  pp_turnaround_velocity: {
+
+  pp_planning_turnaround_control: {
     quickWins: [
-      'Map job queue delays, planning bottlenecks, and late-stage handoff failures.',
+      'Map job queue delays, planning bottlenecks, sequencing failures, and late-stage handoff losses.',
       'Introduce daily visual scheduling and turnaround dashboards at plant leadership level.',
-      'Stabilise the planning-to-press-to-finishing flow around actual capacity.',
+      'Stabilise the planning-to-press-to-finishing flow around actual capacity and customer priority.',
     ],
     priorities: [
       'Treat turnaround velocity as a strategic client-retention lever.',
@@ -61,6 +78,59 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Reduce avoidable queue time and hidden capacity loss across the full workflow.',
     ],
   },
+
+  pp_specification_change_control: {
+    quickWins: [
+      'Audit artwork, specification, proofing, approval, and version-control failure points.',
+      'Institute strict change-control and release governance before jobs reach press.',
+      'Escalate recurring client-specification errors through a single accountability mechanism.',
+    ],
+    priorities: [
+      'Build right-first-time specification control into the commercial and production workflow.',
+      'Reduce rerun risk by hardening approval gates and job-release discipline.',
+      'Protect client trust by tightening specification integrity and change governance.',
+    ],
+  },
+
+  pp_capacity_bottleneck_balance: {
+    quickWins: [
+      'Measure setup time, changeover loss, net productive hours, and bottlenecks by press and finishing asset.',
+      'Attack the largest setup and sequencing losses through focused reduction sprints.',
+      'Rebalance jobs across press and finishing capacity to reduce hidden idle time and queue buildup.',
+    ],
+    priorities: [
+      'Raise effective capacity through setup-time reduction and smarter utilisation governance.',
+      'Use press productivity and finishing flow as margin levers, not just technical metrics.',
+      'Link asset utilisation to executive review of turnaround, gross margin, and service performance.',
+    ],
+  },
+
+  pp_waste_rework: {
+    quickWins: [
+      'Quantify waste, reruns, and spoilage at job, press, and finishing level.',
+      'Identify the largest avoidable margin leaks caused by waste or rework.',
+      'Install daily control on rerun causes, spoilage rates, and corrective owner actions.',
+    ],
+    priorities: [
+      'Restore gross margin by treating waste and rework as executive control issues.',
+      'Assign owner-led recovery plans to recurring waste pools.',
+      'Institutionalise right-first-time discipline across the end-to-end print flow.',
+    ],
+  },
+
+  pp_turnaround_velocity: {
+    quickWins: [
+      'Map job queue delays, planning bottlenecks, and late-stage handoff failures.',
+      'Introduce daily visual scheduling and turnaround dashboards.',
+      'Stabilise the planning-to-press-to-finishing flow around actual capacity.',
+    ],
+    priorities: [
+      'Treat turnaround velocity as a strategic client-retention lever.',
+      'Use scheduling control and on-time delivery as core executive operating measures.',
+      'Reduce avoidable queue time and hidden capacity loss.',
+    ],
+  },
+
   pp_specification_control: {
     quickWins: [
       'Audit artwork, specification, proofing, and approval failure points.',
@@ -73,6 +143,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Protect client trust by tightening specification integrity and change governance.',
     ],
   },
+
   pp_press_utilisation: {
     quickWins: [
       'Measure setup time, changeover loss, and usable press hours by asset.',
@@ -81,104 +152,8 @@ const LIBRARY: Record<string, RecommendationSet> = {
     ],
     priorities: [
       'Raise effective capacity through setup-time reduction and smarter utilisation governance.',
-      'Use press productivity and finishing flow as margin levers, not just technical metrics.',
+      'Use press productivity and finishing flow as margin levers.',
       'Link asset utilisation to executive review of turnaround and gross margin.',
-    ],
-  },
-  mfg_bottleneck_throughput: {
-    quickWins: [
-      'Map the primary bottleneck and quantify lost throughput with hard operational data.',
-      'Stabilise upstream and downstream flow around the true constraint.',
-      'Launch rapid countermeasures on the highest-value throughput losses.',
-    ],
-    priorities: [
-      'Treat throughput acceleration as a strategic value-creation programme.',
-      'Align production planning, staffing, and maintenance around the true bottleneck.',
-      'Install executive visibility on constraint performance and output recovery.',
-    ],
-  },
-  mfg_quality_source: {
-    quickWins: [
-      'Quantify defect, scrap, and rework failure points at source.',
-      'Contain the highest-impact quality escapes immediately.',
-      'Reset quality ownership at the points where defects are created, not discovered later.',
-    ],
-    priorities: [
-      'Embed quality-at-source as a core leadership discipline.',
-      'Reduce cost-of-poor-quality through hard controls and visible accountability.',
-      'Use first-pass quality and defect prevention as margin protection levers.',
-    ],
-  },
-  mfg_supply_chain_exposure: {
-    quickWins: [
-      'Stress-test supplier risk, lead-time volatility, and inventory vulnerabilities.',
-      'Map where material constraints are threatening throughput and customer delivery.',
-      'Create executive visibility on the most material supply-chain exposures.',
-    ],
-    priorities: [
-      'Strengthen supply continuity and lead-time control as a resilience agenda.',
-      'Reduce operational fragility by rebalancing inventory, sourcing, and planning discipline.',
-      'Move supply-chain risk from reactive firefighting into structured executive control.',
-    ],
-  },
-  mfg_oee_capacity: {
-    quickWins: [
-      'Break down OEE losses into availability, performance, and quality components.',
-      'Target the most material downtime and speed losses immediately.',
-      'Build daily visibility on practical capacity recovery by line and asset.',
-    ],
-    priorities: [
-      'Treat OEE and capacity underperformance as executive productivity issues.',
-      'Raise asset productivity through disciplined visibility and ownership.',
-      'Link effective capacity to monthly margin and service-level outcomes.',
-    ],
-  },
-  con_project_margin: {
-    quickWins: [
-      'Map margin leakage by live project, package, and major cost driver.',
-      'Identify where budget drift, procurement slippage, or execution waste is eroding project economics.',
-      'Install weekly project commercial reviews on the most exposed jobs.',
-    ],
-    priorities: [
-      'Protect project margin through disciplined cost control and owner-level accountability.',
-      'Treat commercial control as a weekly operating discipline, not a month-end exercise.',
-      'Escalate margin recovery on live projects with visible leadership sponsorship.',
-    ],
-  },
-  con_schedule_slippage: {
-    quickWins: [
-      'Identify critical-path slippage and quantify the delivery and cash implications.',
-      'Stabilise milestone governance and short-interval control on delayed projects.',
-      'Link site actions directly to the schedule drivers that matter most.',
-    ],
-    priorities: [
-      'Use critical-path visibility as a core executive control mechanism.',
-      'Reduce schedule drift through disciplined site and project governance.',
-      'Treat programme integrity as central to delivery credibility and cash protection.',
-    ],
-  },
-  con_variations_claims: {
-    quickWins: [
-      'Audit current variations, claims, approvals, and unresolved commercial exposures.',
-      'Tighten the evidence trail and approval discipline around change events.',
-      'Escalate at-risk claims before value leakage becomes irreversible.',
-    ],
-    priorities: [
-      'Treat variation and claim control as a commercial recovery engine.',
-      'Strengthen governance over changes, approvals, and contractual entitlement.',
-      'Use executive oversight to protect commercial value already earned on site.',
-    ],
-  },
-  con_cashflow_controls: {
-    quickWins: [
-      'Map billing, certification, and collection blockages across live projects.',
-      'Quantify cash exposure from retentions, delayed certificates, and weak billing cadence.',
-      'Install weekly project cash reviews on the most exposed contracts.',
-    ],
-    priorities: [
-      'Treat project cash flow as a first-order executive control measure.',
-      'Tighten billing, certification, and collection discipline across the portfolio.',
-      'Protect liquidity by linking project controls directly to cash realisation.',
     ],
   },
 
@@ -194,6 +169,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Use standard-cost drift and realised margin contribution as leadership steering measures across the manufacturing network.',
     ],
   },
+
   mfg_schedule_delivery_velocity: {
     quickWins: [
       'Map where MPS, MRP, finite loading, setup loss, supplier variability, and dispatch bottlenecks are destabilising schedule adherence.',
@@ -206,6 +182,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Use schedule adherence and delivery velocity as executive operating measures, not only production-planning metrics.',
     ],
   },
+
   mfg_quality_specification_control: {
     quickWins: [
       'Audit engineering changes, BOM/version accuracy, routing discipline, work-instruction adherence, and first-pass yield by product family.',
@@ -218,6 +195,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Use first-pass quality and recurrence prevention as core margin-protection levers.',
     ],
   },
+
   mfg_asset_oee_capacity: {
     quickWins: [
       'Break OEE into availability, performance, and quality-rate losses by line, asset, and shift.',
@@ -228,6 +206,175 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Use OEE and asset productivity as value-creation measures tied directly to margin, delivery, and working capital.',
       'Rebalance assets, cells, and plant loading around practical constraints rather than nominal capacity.',
       'Treat automation, skill dependency, and network capacity balance as leadership decisions, not only engineering topics.',
+    ],
+  },
+
+  mfg_bottleneck_throughput: {
+    quickWins: [
+      'Map the primary bottleneck and quantify lost throughput with hard operational data.',
+      'Stabilise upstream and downstream flow around the true constraint.',
+      'Launch rapid countermeasures on the highest-value throughput losses.',
+    ],
+    priorities: [
+      'Treat throughput acceleration as a strategic value-creation programme.',
+      'Align production planning, staffing, and maintenance around the true bottleneck.',
+      'Install executive visibility on constraint performance and output recovery.',
+    ],
+  },
+
+  mfg_quality_source: {
+    quickWins: [
+      'Quantify defect, scrap, and rework failure points at source.',
+      'Contain the highest-impact quality escapes immediately.',
+      'Reset quality ownership at the points where defects are created, not discovered later.',
+    ],
+    priorities: [
+      'Embed quality-at-source as a core leadership discipline.',
+      'Reduce cost-of-poor-quality through hard controls and visible accountability.',
+      'Use first-pass quality and defect prevention as margin protection levers.',
+    ],
+  },
+
+  mfg_supply_chain_exposure: {
+    quickWins: [
+      'Stress-test supplier risk, lead-time volatility, and inventory vulnerabilities.',
+      'Map where material constraints are threatening throughput and customer delivery.',
+      'Create executive visibility on the most material supply-chain exposures.',
+    ],
+    priorities: [
+      'Strengthen supply continuity and lead-time control as a resilience agenda.',
+      'Reduce operational fragility by rebalancing inventory, sourcing, and planning discipline.',
+      'Move supply-chain risk from reactive firefighting into structured executive control.',
+    ],
+  },
+
+  mfg_oee_capacity: {
+    quickWins: [
+      'Break down OEE losses into availability, performance, and quality components.',
+      'Target the most material downtime and speed losses immediately.',
+      'Build daily visibility on practical capacity recovery by line and asset.',
+    ],
+    priorities: [
+      'Treat OEE and capacity underperformance as executive productivity issues.',
+      'Raise asset productivity through disciplined visibility and ownership.',
+      'Link effective capacity to monthly margin and service-level outcomes.',
+    ],
+  },
+
+  con_portfolio_margin_erosion: {
+    quickWins: [
+      'Build a portfolio-level view of tender risk, current forecast margin, central overhead absorption, and project selection quality.',
+      'Identify under-bid or wrong-fit projects that are consuming capacity without adequate margin protection.',
+      'Create executive visibility on which projects, clients, or packages are structurally eroding portfolio margin.',
+    ],
+    priorities: [
+      'Treat tender selection and portfolio mix as the first layer of construction margin control.',
+      'Tighten bid/no-bid discipline, risk pricing, and executive review of margin-at-risk work.',
+      'Use portfolio margin quality as a leadership steering measure across regions, project types, and clients.',
+    ],
+  },
+
+  con_commercial_leakage_claims: {
+    quickWins: [
+      'Audit current variations, claims, approvals, notices, and unresolved entitlement exposures.',
+      'Tighten the evidence trail and approval discipline around change events.',
+      'Escalate at-risk claims before value leakage becomes irreversible.',
+    ],
+    priorities: [
+      'Treat variation and claim control as a commercial recovery engine.',
+      'Strengthen governance over changes, approvals, notices, and contractual entitlement.',
+      'Use executive oversight to protect commercial value already earned on site.',
+    ],
+  },
+
+  con_operational_delivery_risk: {
+    quickWins: [
+      'Map site productivity loss, rework, idle plant, subcontractor delays, and supervision weaknesses on exposed projects.',
+      'Identify where operational execution failure is destroying commercial performance.',
+      'Create short-interval control around the sites or packages carrying the greatest value at risk.',
+    ],
+    priorities: [
+      'Treat site execution as a margin and delivery-control system, not only a construction activity.',
+      'Tighten subcontractor coordination, supervision cadence, productivity tracking, and quality recovery.',
+      'Link project-level operating recovery directly to forecast margin and milestone achievement.',
+    ],
+  },
+
+  con_schedule_coordination_slippage: {
+    quickWins: [
+      'Identify critical-path slippage and quantify the delivery and cash implications.',
+      'Stabilise milestone governance and short-interval control on delayed projects.',
+      'Link site actions directly to the schedule drivers that matter most.',
+    ],
+    priorities: [
+      'Use critical-path visibility as a core executive control mechanism.',
+      'Reduce schedule drift through disciplined site and project governance.',
+      'Treat programme integrity as central to delivery credibility and cash protection.',
+    ],
+  },
+
+  con_cashflow_certification_exposure: {
+    quickWins: [
+      'Map billing, certification, retention, and collection blockages across live projects.',
+      'Quantify cash exposure from delayed certificates, WIP, retentions, and weak billing cadence.',
+      'Install weekly project cash reviews on the most exposed contracts.',
+    ],
+    priorities: [
+      'Treat project cash flow as a first-order executive control measure.',
+      'Tighten billing, certification, valuation, and collection discipline across the portfolio.',
+      'Protect liquidity by linking project controls directly to cash realisation.',
+    ],
+  },
+
+  con_project_margin: {
+    quickWins: [
+      'Map margin leakage by live project, package, and major cost driver.',
+      'Identify where budget drift, procurement slippage, or execution waste is eroding project economics.',
+      'Install weekly project commercial reviews on the most exposed jobs.',
+    ],
+    priorities: [
+      'Protect project margin through disciplined cost control and owner-level accountability.',
+      'Treat commercial control as a weekly operating discipline, not a month-end exercise.',
+      'Escalate margin recovery on live projects with visible leadership sponsorship.',
+    ],
+  },
+
+  con_schedule_slippage: {
+    quickWins: [
+      'Identify critical-path slippage and quantify delivery and cash implications.',
+      'Stabilise milestone governance and short-interval control on delayed projects.',
+      'Link site actions directly to schedule drivers that matter most.',
+    ],
+    priorities: [
+      'Use critical-path visibility as a core executive control mechanism.',
+      'Reduce schedule drift through disciplined site and project governance.',
+      'Treat programme integrity as central to delivery credibility and cash protection.',
+    ],
+  },
+
+  con_variations_claims: {
+    quickWins: [
+      'Audit current variations, claims, approvals, and unresolved commercial exposures.',
+      'Tighten the evidence trail and approval discipline around change events.',
+      'Escalate at-risk claims before value leakage becomes irreversible.',
+    ],
+    priorities: [
+      'Treat variation and claim control as a commercial recovery engine.',
+      'Strengthen governance over changes, approvals, and contractual entitlement.',
+      'Use executive oversight to protect commercial value already earned on site.',
+    ],
+  },
+
+  con_cashflow_controls: {
+    quickWins: [
+      'Map billing, certification, and collection blockages across live projects.',
+      'Quantify cash exposure from retentions, delayed certificates, and weak billing cadence.',
+      'Install weekly project cash reviews on the most exposed contracts.',
+    ],
+    priorities: [
+      'Treat project cash flow as a first-order executive control measure.',
+      'Tighten billing, certification, and collection discipline across the portfolio.',
+      'Protect liquidity by linking project controls directly to cash realisation.',
     ],
   },
 
@@ -243,6 +390,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Link yield-realisation governance directly to margin, storage, and cash expectations.',
     ],
   },
+
   ag_margin_cost_control: {
     quickWins: [
       'Build a gross-margin waterfall per hectare or per animal showing yield shortfall, price realisation variance, input variance, and waste/shrinkage.',
@@ -255,6 +403,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Use realised gross margin per hectare or per animal as a core leadership steering metric.',
     ],
   },
+
   ag_risk_management: {
     quickWins: [
       'Map weather, biological, market, and counterparty risks with probability-weighted financial impact.',
@@ -267,6 +416,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Use risk layering and resilience metrics as standard executive review items, not exception cases only.',
     ],
   },
+
   ag_working_capital_cash_cycle: {
     quickWins: [
       'Map seasonal funding peaks, inventory carrying cost, harvest-to-cash timing, and buyer payment terms across the cycle.',
@@ -280,31 +430,33 @@ const LIBRARY: Record<string, RecommendationSet> = {
     ],
   },
 
-  hc_clinical_quality_safety: {
+  hc_private_practice_operations: {
     quickWins: [
-      'Quantify quality and safety variance by facility, specialty, department, or practice and separate system issues from clinician-level variability.',
-      'Map infections, readmissions, adverse events, protocol-adherence gaps, and handover failure on the highest-risk services.',
-      'Create visible control on the clinical risks most likely to damage both outcomes and economics.',
+      'Map appointment scheduling, patient file completeness, claims documentation, billing follow-up, and debtor control across the practice workflow.',
+      'Separate clinical workload from avoidable front-office administrative friction so doctors and clinical staff are not pulled into non-clinical bottlenecks.',
+      'Create a simple practice dashboard covering appointment utilisation, patient waiting time, claims status, billing delays, and cash-flow visibility.',
     ],
     priorities: [
-      'Treat clinical quality and patient safety as the first control system of the healthcare operating model.',
-      'Use clinical governance, standardisation, and outcome transparency to reduce both harm and economic leakage.',
-      'Link quality recovery directly to reputation, contribution margin, and network resilience.',
+      'Build a disciplined private-practice operating model around front-office workflow, patient administration, claims control, and doctor utilisation.',
+      'Tighten role accountability between reception, clinical staff, billing, finance, and practice management.',
+      'Use appointment utilisation, claims follow-up, patient file completeness, debtor control, and service quality as weekly management measures.',
     ],
   },
-  hc_margin_case_contribution: {
+
+  hc_clinic_access_flow: {
     quickWins: [
-      'Build a contribution waterfall per case, admission, consultation, specialty, or patient panel including payer mix and direct-cost leakage.',
-      'Separate case-mix and tariff issues from theatre, implant, drug, LOS, and claim-rejection leakage.',
-      'Create executive visibility on where contribution is being destroyed by funding and cost-to-serve mismatch.',
+      'Map patient access, booking flow, triage, consultation-room utilisation, waiting times, and follow-up appointment discipline.',
+      'Separate true capacity shortage from scheduling friction, queue-management failure, and avoidable handoff delays.',
+      'Create daily visibility on patient throughput, waiting time, no-shows, staff loading, and unresolved follow-ups.',
     ],
     priorities: [
-      'Treat contribution per case or patient as a strategic and operating-system control measure, not just a finance output.',
-      'Tighten payer mix, tariff discipline, case costing, and formulary or consumable control where the value at risk is highest.',
-      'Use contribution visibility to steer specialty mix, network design, and service-line investment.',
+      'Treat clinic access and patient flow as a structured operating control system.',
+      'Tighten appointment booking, triage, nurse/doctor scheduling, room allocation, and patient communication.',
+      'Use access reliability and waiting-time control to improve patient experience and service capacity.',
     ],
   },
-  hc_operational_capacity_flow: {
+
+  hc_hospital_capacity_flow: {
     quickWins: [
       'Map theatres, beds, diagnostics, consultation rooms, discharge planning, and patient-journey bottlenecks on the most exposed services.',
       'Separate pure capacity shortage from scheduling failure, handoff delay, and avoidable flow disruption.',
@@ -316,18 +468,98 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Use flow reliability to improve both patient experience and productive capacity.',
     ],
   },
+
   hc_revenue_cycle_cash: {
     quickWins: [
-      'Map authorisation delays, coding gaps, denials, billing errors, co-payment leakage, and patient account aging across the cycle.',
+      'Map authorisation delays, coding gaps, denials, billing errors, co-payment leakage, patient account aging, and claims follow-up across the cycle.',
       'Quantify where revenue is being delayed, denied, or lost after care has already been delivered.',
-      'Install visible control on the highest-value claim and collection failure points.',
+      'Install visible control on the highest-value claim, billing, and collection failure points.',
     ],
     priorities: [
       'Treat the revenue cycle as a core healthcare operating discipline, not a back-office afterthought.',
-      'Tighten coding, authorisation, billing, and collection governance where cash conversion is weakest.',
+      'Tighten coding, authorisation, billing, claims follow-up, and collection governance where cash conversion is weakest.',
       'Link revenue-cycle control directly to working capital, contribution preservation, and funding resilience.',
     ],
   },
+
+  hc_clinical_quality_safety: {
+    quickWins: [
+      'Quantify quality and safety variance by facility, specialty, department, or practice and separate system issues from clinician-level variability.',
+      'Map adverse events, protocol-adherence gaps, documentation quality, handover failure, and high-risk care variation.',
+      'Create visible control on the clinical risks most likely to damage both outcomes and economics.',
+    ],
+    priorities: [
+      'Treat clinical quality and patient safety as the first control system of the healthcare operating model.',
+      'Use clinical governance, standardisation, and outcome transparency to reduce both harm and economic leakage.',
+      'Link quality recovery directly to reputation, contribution margin, and operating resilience.',
+    ],
+  },
+
+  hc_margin_case_contribution: {
+    quickWins: [
+      'Build a contribution waterfall per case, consultation, specialty, or patient panel including payer mix and direct-cost leakage.',
+      'Separate case-mix, tariff, direct-cost, claim-rejection, and service-line economics issues.',
+      'Create executive visibility on where contribution is being destroyed by funding and cost-to-serve mismatch.',
+    ],
+    priorities: [
+      'Treat contribution per case, consultation, or patient as a strategic healthcare control measure.',
+      'Tighten payer mix, tariff discipline, case costing, consumable control, and service-line profitability review.',
+      'Use contribution visibility to steer specialty mix, pricing, capacity, and service investment.',
+    ],
+  },
+
+  hc_medical_supplier_stock_distribution: {
+    quickWins: [
+      'Map stock availability, inventory turns, batch control, expiry risk, supplier lead times, debtor exposure, and distribution reliability.',
+      'Identify where stockouts, expired stock, late delivery, or weak debtor control are eroding service performance and cash flow.',
+      'Create one dashboard covering inventory health, order fulfilment, debtor days, and critical customer service levels.',
+    ],
+    priorities: [
+      'Treat stock discipline, distribution reliability, and debtor control as one healthcare supply operating system.',
+      'Tighten procurement, batch control, expiry management, delivery planning, and collections cadence.',
+      'Use inventory turns, stock availability, service reliability, and debtor performance as executive control measures.',
+    ],
+  },
+
+  hc_pharmacy_margin_stock_control: {
+    quickWins: [
+      'Map script flow, dispensary workload, medicine stock turns, expired stock, front-shop performance, and margin leakage.',
+      'Identify where prescription volume, stock discipline, shrinkage, or pricing gaps are eroding pharmacy contribution.',
+      'Create daily visibility on scripts, stockouts, expiry risk, gross margin, and pharmacist capacity.',
+    ],
+    priorities: [
+      'Treat script flow, stock control, and margin discipline as the core operating system of the pharmacy.',
+      'Tighten stock replenishment, schedule medicine control, expiry management, dispensary workflow, and front-shop economics.',
+      'Use stock turns, script throughput, shrinkage, and margin quality as management steering metrics.',
+    ],
+  },
+
+  hc_healthcare_admin_compliance: {
+    quickWins: [
+      'Map administrative workflow, document control, compliance records, reporting gaps, role clarity, and staff workload across the healthcare operation.',
+      'Identify where poor administration is creating patient confidentiality, billing, compliance, or management-visibility risk.',
+      'Create a simple compliance and management dashboard covering open actions, missing documents, reporting delays, and workflow bottlenecks.',
+    ],
+    priorities: [
+      'Treat healthcare administration and compliance visibility as a core operating-control layer.',
+      'Tighten role accountability, document control, reporting cadence, patient confidentiality processes, and management action tracking.',
+      'Use administrative discipline to protect patient trust, compliance posture, cash flow, and leadership visibility.',
+    ],
+  },
+
+  hc_operational_capacity_flow: {
+    quickWins: [
+      'Map patient flow, scheduling, consultation capacity, diagnostic bottlenecks, documentation quality, and revenue-cycle pressure in the specific care setting.',
+      'Separate true care-capacity shortage from administrative friction, scheduling weakness, or workflow breakdown.',
+      'Build daily visibility on patient throughput, cancellations, waiting pressure, claims status, and management actions.',
+    ],
+    priorities: [
+      'Treat patient flow and capacity utilisation as a care-quality and economic control system together.',
+      'Tighten scheduling, handoffs, documentation, billing, and operating reviews around the real bottlenecks.',
+      'Use flow reliability to improve patient experience, productive capacity, and cash conversion.',
+    ],
+  },
+
   en_project_margin_irr: {
     quickWins: [
       'Build a base-case to current-case IRR waterfall by project, technology, region, and cause of erosion.',
@@ -340,6 +572,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Use project-economics visibility to steer future development, storage, and diversification decisions.',
     ],
   },
+
   en_schedule_commissioning: {
     quickWins: [
       'Map delay from permitting, land, grid connection, EPC execution, weather windows, and commissioning handover gaps.',
@@ -352,6 +585,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Use delay visibility to protect both economics and funding timing.',
     ],
   },
+
   en_contractual_claims: {
     quickWins: [
       'Audit variation recovery, performance guarantees, curtailment compensation, insurance claims, and EPC/OEM contractual exposure.',
@@ -364,6 +598,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Use executive oversight to protect earned value and reduce contractual leakage.',
     ],
   },
+
   en_cashflow_transition: {
     quickWins: [
       'Map construction-phase funding peaks, drawdown timing, bonding exposure, and operational-phase cash conversion by project.',
@@ -376,6 +611,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Use funding-headroom visibility to protect delivery continuity and return realisation.',
     ],
   },
+
   margin_leakage: {
     quickWins: [
       'Identify and quantify the top three margin leakage points with line-item precision.',
@@ -388,6 +624,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Embed weekly operating reviews that track margin recovery progress in real time.',
     ],
   },
+
   workflow_breakdown: {
     quickWins: [
       'Map the end-to-end workflow and isolate the primary execution bottlenecks.',
@@ -400,6 +637,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Implement service-level tracking and performance dashboards for turnaround and output quality.',
     ],
   },
+
   planning_failure: {
     quickWins: [
       'Stress-test current planning assumptions against actual demand and capacity realities.',
@@ -412,6 +650,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Embed disciplined review mechanisms for forecast, schedule, and delivery adjustments.',
     ],
   },
+
   capacity_constraint: {
     quickWins: [
       'Diagnose the root throughput or utilisation constraint with data-driven precision.',
@@ -424,6 +663,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Sequence improvement initiatives around the true operational bottleneck.',
     ],
   },
+
   compliance_risk: {
     quickWins: [
       'Quantify immediate compliance exposure and prioritise highest-risk control gaps.',
@@ -436,6 +676,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Embed executive review discipline to monitor remediation progress and residual risk.',
     ],
   },
+
   service_quality_risk: {
     quickWins: [
       'Quantify the primary service and quality failure points impacting client experience.',
@@ -448,6 +689,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Track service recovery against measurable client outcome and satisfaction KPIs.',
     ],
   },
+
   cash_flow_stress: {
     quickWins: [
       'Conduct a rapid diagnostic of debtors, creditors, and working capital pressure points.',
@@ -460,6 +702,7 @@ const LIBRARY: Record<string, RecommendationSet> = {
       'Build forward-looking cash visibility and scenario planning capability.',
     ],
   },
+
   general_operational_pressure: {
     quickWins: [
       'Clarify the highest-impact execution pressure points with executive precision.',
