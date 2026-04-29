@@ -56,7 +56,7 @@ export default function UpdatePasswordPage() {
       <header style={{ background: '#fff', borderBottom: '1px solid #e5e8ef', padding: '0 34px' }}>
         <div style={{ maxWidth: '1240px', margin: '0 auto', minHeight: '72px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <button onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-            <img src="/assets/nexus.png" alt="Nexus" style={{ height: '40px', width: 'auto', display: 'block' }} />
+            <img src="/assets/brand/nexus-logo-full.svg" alt="Nexus" style={{ height: '40px', width: 'auto', display: 'block' }} />
           </button>
           <div style={{ fontSize: '14px', color: '#5e6c88' }}>
             Remember your password?{' '}

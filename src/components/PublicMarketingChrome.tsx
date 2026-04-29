@@ -44,7 +44,7 @@ export function PublicHeader({ rightContent }: { rightContent?: ReactNode }) {
             whiteSpace: 'nowrap',
           }}
         >
-          <img src="/assets/nexus.png" alt="Nexus" style={{ height: '46px', width: 'auto', display: 'block', flexShrink: 0 }} />
+          <img src="/assets/brand/nexus-logo-full.svg" alt="Nexus" style={{ height: '46px', width: 'auto', display: 'block', flexShrink: 0 }} />
           <span style={{ color: BRAND_BLUE, fontSize: '18px', fontWeight: 500, letterSpacing: '-0.01em' }}>NEXUS</span>
         </Link>
 
@@ -197,7 +197,7 @@ export function PublicFooter() {
 
         <div style={{ borderTop: '1px solid #d9e0ea', marginTop: '18px', paddingTop: '18px' }}>
           <div style={{ display: 'flex', alignItems: 'center', width: '100%', color: '#32405d', fontWeight: 400, fontSize: '14px' }}>
-            <img src="/assets/nexus.png" alt="Nexus" style={{ height: '42px', width: 'auto', display: 'block', flexShrink: 0 }} />
+            <img src="/assets/brand/nexus-logo-full.svg" alt="Nexus" style={{ height: '42px', width: 'auto', display: 'block', flexShrink: 0 }} />
             <span style={{ marginLeft: '15px', lineHeight: '1' }}>NEXUS Advisory Intelligence Platform</span>
             <span style={{ marginLeft: 'auto', lineHeight: '1', textAlign: 'right' }}>Connecting data. Driving decisions.</span>
           </div>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+  <title id="title">NEXUS Advisory Intelligence Engine logo</title>
+  <desc id="desc">Final NEXUS logo lockup with silver mountain-X mark, NEXUS wordmark, and Advisory Intelligence Engine descriptor.</desc>
+  <defs>
+    <linearGradient id="nexusSilver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F7F8FA"/>
+      <stop offset="42%" stop-color="#C0C4CC"/>
+      <stop offset="70%" stop-color="#F7F8FA"/>
+      <stop offset="100%" stop-color="#A0A7B3"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <!-- Symbol -->
+  <g id="nexus-mark" fill="none" stroke="url(#nexusSilver)" stroke-width="22" stroke-linecap="butt" stroke-linejoin="miter" filter="url(#softShadow)">
+    <path d="M397 132 H486 L563 42"/>
+    <path d="M520 42 L601 132 H803"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="600" y="282"
+        text-anchor="middle"
+        fill="url(#nexusSilver)"
+        font-family="Montserrat, Avenir Next, Arial, sans-serif"
+        font-size="94"
+        font-weight="600"
+        letter-spacing="42"
+        filter="url(#softShadow)">NEXUS</text>
+
+  <!-- Descriptor -->
+  <text x="600" y="348"
+        text-anchor="middle"
+        fill="#C0C4CC"
+        font-family="Montserrat, Avenir Next, Arial, sans-serif"
+        font-size="25"
+        font-weight="500"
+        letter-spacing="11">ADVISORY INTELLIGENCE ENGINE</text>
+</svg>
