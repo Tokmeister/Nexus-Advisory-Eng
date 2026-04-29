@@ -10,7 +10,7 @@ import { buildConfidence, buildConsultantNote, buildExecutiveSummary, buildFocus
 
 const OUTPUT_STORAGE_KEY = 'nexus_advisory_output_v6';
 const REPORTS_HISTORY_KEY = 'nexus_reports_v3';
-const REPORT_LOGO_SRC = '/assets/brand/nexus-logo-full.png';
+const REPORT_LOGO_SRC = '/assets/brand/nexus-logo-full.svg';
 
 export function buildAdvisoryOutput(input: AdvisoryInput): AdvisoryRecord {
   const errors = validateInput(input);
