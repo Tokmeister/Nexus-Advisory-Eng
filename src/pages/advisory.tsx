@@ -84,6 +84,50 @@ function clean(value: unknown): string {
   return String(value || '').trim();
 }
 
+function readAxiomPrefillFromUrl(): {
+  formData: Record<string, string>;
+  industry: string;
+  urgency: string;
+} | null {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('source') !== 'axiom') return null;
+
+    const rawPrefill = params.get('prefill');
+    if (!rawPrefill) return null;
+
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(rawPrefill) as Record<string, unknown>;
+    } catch {
+      parsed = JSON.parse(decodeURIComponent(rawPrefill)) as Record<string, unknown>;
+    }
+
+    const normalisedUrgency = clean(parsed.urgency);
+    const allowedUrgency = urgencyOptions.includes(normalisedUrgency) ? normalisedUrgency : 'Medium';
+
+    return {
+      formData: {
+        client: clean(parsed.client_name),
+        challenge: clean(parsed.primary_business_challenge),
+        goal: clean(parsed.strategic_goal),
+        constraints: clean(parsed.known_constraints),
+        valueType: clean(parsed.value_type),
+        estimatedValue: clean(parsed.estimated_value_zar),
+        businessFunction: clean(parsed.business_function_affected),
+        impactAreas: clean(parsed.impact_areas),
+        financialExposure: clean(parsed.estimated_financial_exposure),
+        triggerSource: clean(parsed.trigger_source),
+        notes: clean(parsed.additional_notes),
+      },
+      industry: clean(parsed.industry),
+      urgency: allowedUrgency,
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function getSupabase(): Promise<SupabaseClientLike> {
   const existing = (window as Window & { __nexusSupabase?: SupabaseClientLike }).__nexusSupabase;
   if (existing) return existing;
@@ -458,6 +502,14 @@ export default function AdvisoryPage() {
     let active = true;
 
     clearCurrentOutput();
+
+    const axiomPrefill = readAxiomPrefillFromUrl();
+    if (axiomPrefill) {
+      setFormData(axiomPrefill.formData);
+      setIndustry(axiomPrefill.industry);
+      setUrgency(axiomPrefill.urgency);
+      setStatusMessage('Prefilled from AXIOM. Review before generating advisory.');
+    }
 
     getCurrentProfile()
       .then((profile) => {
