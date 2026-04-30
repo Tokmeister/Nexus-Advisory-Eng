@@ -371,7 +371,7 @@ export default function NexusShell({ children }: NexusShellProps) {
       >
         <div style={{ padding: '1.25rem 1rem 0.75rem', display: 'flex', justifyContent: 'center' }}>
           <img
-            src="/assets/brand/nexus-logo-full.svg"
+            src="/assets/nexus.png"
             alt="Nexus Logo"
             style={{
               width: sidebarCollapsed ? '36px' : '160px',
